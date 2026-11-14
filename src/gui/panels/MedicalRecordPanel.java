@@ -83,14 +83,6 @@ public class MedicalRecordPanel extends JPanel {
 
         panel.add(textPanel, BorderLayout.WEST);
 
-        JLabel doctorLabel = new JLabel(
-                "Doctor: " + currentDoctorName
-        );
-        doctorLabel.setFont(new Font("SansSerif", Font.BOLD, 13));
-        doctorLabel.setForeground(TEAL);
-
-        panel.add(doctorLabel, BorderLayout.EAST);
-
         return panel;
     }
 
