@@ -1,5 +1,6 @@
 package gui;
 
+import gui.panels.AppointmentPanel;
 import gui.panels.PatientPanel;
 import gui.panels.MedicalRecordPanel;
 
@@ -259,6 +260,14 @@ public class DashboardFrame extends JFrame {
             );
         }
 
+        if (role.equals("Doctor") || role.equals("Nurse")) {
+
+            contentPanel.add(
+                    new AppointmentPanel(staffId, name, role),
+                    "Appointments"
+            );
+        }
+
         return contentPanel;
     }
 
@@ -501,7 +510,8 @@ public class DashboardFrame extends JFrame {
         card.add(descriptionLabel);
 
         if (title.equals("Patient Directory")
-                || title.equals("Medical Records")) {
+                || title.equals("Medical Records")
+                || title.equals("Appointments")) {
 
             card.setCursor(
                     Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
@@ -516,6 +526,8 @@ public class DashboardFrame extends JFrame {
                         showPage("Patients");
                     } else if (title.equals("Medical Records")) {
                         showPage("Medical Records");
+                    } else if (title.equals("Appointments")) {
+                        showPage("Appointments");
                     }
                 }
             });

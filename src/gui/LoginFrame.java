@@ -96,7 +96,7 @@ public class LoginFrame extends JFrame {
         brandName.setFont(new Font("SansSerif", Font.BOLD, 19));
         brandName.setForeground(Color.WHITE);
 
-        JLabel brandSubtitle = new JLabel("HOSPITAL INFORMATION SYSTEM");
+        JLabel brandSubtitle = new JLabel("HOSPITAL MANAGEMENT SYSTEM");
         brandSubtitle.setFont(new Font("SansSerif", Font.PLAIN, 9));
         brandSubtitle.setForeground(new Color(173, 204, 201));
 
@@ -189,7 +189,7 @@ public class LoginFrame extends JFrame {
         eyebrow.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         JLabel heading = createLabel(
-                "Staff sign in", 30, Font.BOLD, TEXT
+                "Sign In", 30, Font.BOLD, TEXT
         );
         heading.setAlignmentX(Component.CENTER_ALIGNMENT);
 
