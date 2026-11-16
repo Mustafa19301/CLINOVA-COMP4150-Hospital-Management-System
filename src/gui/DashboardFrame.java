@@ -12,6 +12,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GradientPaint;
 
 public class DashboardFrame extends JFrame {
 
@@ -56,14 +59,31 @@ public class DashboardFrame extends JFrame {
 
     private JPanel createHeader() {
 
-        JPanel header = new JPanel(new BorderLayout());
-        header.setBackground(WHITE);
+        JPanel header = new JPanel(new BorderLayout()) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+
+                Graphics2D g2 = (Graphics2D) g.create();
+
+                GradientPaint gradient = new GradientPaint(
+                        0, 0, new Color(23, 107, 104),
+                        getWidth(), 0, new Color(239, 249, 246)
+                );
+
+                g2.setPaint(gradient);
+                g2.fillRect(0, 0, getWidth(), getHeight());
+
+                g2.dispose();
+            }
+        };
+        header.setOpaque(false);
         header.setBorder(new EmptyBorder(17, 30, 17, 30));
         header.setPreferredSize(new Dimension(0, 76));
 
         JLabel brand = new JLabel("CAREPOINT");
         brand.setFont(new Font("SansSerif", Font.BOLD, 20));
-        brand.setForeground(DARK);
+        brand.setForeground(Color.WHITE);
 
         JPanel profile = new JPanel(new FlowLayout(
                 FlowLayout.RIGHT, 12, 0
@@ -89,11 +109,11 @@ public class DashboardFrame extends JFrame {
 
         JLabel employeeName = new JLabel(name);
         employeeName.setFont(new Font("SansSerif", Font.BOLD, 13));
-        employeeName.setForeground(TEXT);
+        employeeName.setForeground(new Color(16, 65, 61));
 
         JLabel employeeRole = new JLabel(role);
         employeeRole.setFont(new Font("SansSerif", Font.PLAIN, 11));
-        employeeRole.setForeground(MUTED);
+        employeeRole.setForeground(new Color(75, 112, 106));
 
         profileText.add(employeeName);
         profileText.add(Box.createVerticalStrut(4));

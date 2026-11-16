@@ -134,17 +134,17 @@ public class PatientPanel extends JPanel {
         );
         patientTable.setForeground(TEXT);
         patientTable.setBackground(WHITE);
-        patientTable.setRowHeight(44);
+        patientTable.setRowHeight(48);
 
         patientTable.setSelectionBackground(
-                new Color(220, 239, 235)
+                new Color(218, 237, 232)
         );
         patientTable.setSelectionForeground(TEXT);
 
         patientTable.setShowVerticalLines(false);
         patientTable.setShowHorizontalLines(true);
         patientTable.setGridColor(
-                new Color(238, 243, 242)
+                new Color(237, 243, 241)
         );
 
         patientTable.setIntercellSpacing(
@@ -157,26 +157,78 @@ public class PatientPanel extends JPanel {
         );
 
         patientTable.setRowMargin(0);
+        patientTable.setFocusable(false);
 
         patientTable.getTableHeader().setFont(
                 new Font("SansSerif", Font.BOLD, 12)
         );
 
         patientTable.getTableHeader().setBackground(
-                new Color(237, 244, 242)
+                new Color(239, 245, 243)
         );
 
-        patientTable.getTableHeader().setForeground(TEXT);
+        patientTable.getTableHeader().setForeground(
+                new Color(69, 91, 91)
+        );
 
         patientTable.getTableHeader().setPreferredSize(
-                new Dimension(0, 45)
+                new Dimension(0, 48)
         );
 
         patientTable.getTableHeader().setReorderingAllowed(false);
         patientTable.getTableHeader().setBorder(
                 BorderFactory.createMatteBorder(
-                        0, 0, 1, 0, BORDER
+                        0, 0, 2, 0, new Color(218, 230, 226)
                 )
+        );
+
+        patientTable.getTableHeader().setDefaultRenderer(
+                new DefaultTableCellRenderer() {
+                    @Override
+                    public Component getTableCellRendererComponent(
+                            JTable table,
+                            Object value,
+                            boolean isSelected,
+                            boolean hasFocus,
+                            int row,
+                            int column
+                    ) {
+
+                        JLabel label = (JLabel)
+                                super.getTableCellRendererComponent(
+                                        table,
+                                        value,
+                                        isSelected,
+                                        hasFocus,
+                                        row,
+                                        column
+                                );
+
+                        label.setFont(
+                                new Font("SansSerif", Font.BOLD, 12)
+                        );
+
+                        label.setForeground(
+                                new Color(69, 91, 91)
+                        );
+
+                        label.setBackground(
+                                new Color(239, 245, 243)
+                        );
+
+                        label.setHorizontalAlignment(
+                                SwingConstants.LEFT
+                        );
+
+                        label.setBorder(
+                                new EmptyBorder(0, 14, 0, 8)
+                        );
+
+                        label.setOpaque(true);
+
+                        return label;
+                    }
+                }
         );
 
         patientTable.getColumnModel().getColumn(0)
@@ -193,6 +245,8 @@ public class PatientPanel extends JPanel {
 
         patientTable.getColumnModel().getColumn(4)
                 .setPreferredWidth(190);
+
+        final int[] hoveredRow = {-1};
 
         DefaultTableCellRenderer cellRenderer =
                 new DefaultTableCellRenderer() {
@@ -218,20 +272,35 @@ public class PatientPanel extends JPanel {
                                 );
 
                         if (isSelected) {
+
                             component.setBackground(
-                                    new Color(220, 239, 235)
+                                    new Color(218, 237, 232)
                             );
+
                             component.setForeground(TEXT);
+
+                        } else if (row == hoveredRow[0]) {
+
+                            component.setBackground(
+                                    new Color(232, 244, 240)
+                            );
+
+                            component.setForeground(TEXT);
+
                         } else {
+
                             component.setBackground(
                                     row % 2 == 0
                                             ? WHITE
-                                            : new Color(249, 251, 250)
+                                            : new Color(248, 251, 250)
                             );
+
                             component.setForeground(TEXT);
                         }
 
-                        setBorder(new EmptyBorder(0, 12, 0, 8));
+                        setBorder(
+                                new EmptyBorder(0, 14, 0, 8)
+                        );
 
                         return component;
                     }
@@ -243,9 +312,31 @@ public class PatientPanel extends JPanel {
                     .setCellRenderer(cellRenderer);
         }
 
+        patientTable.addMouseMotionListener(new MouseAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+
+                int row = patientTable.rowAtPoint(e.getPoint());
+
+                if (hoveredRow[0] != row) {
+                    hoveredRow[0] = row;
+                    patientTable.repaint();
+                }
+            }
+        });
+
         patientTable.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+
+                hoveredRow[0] = -1;
+                patientTable.repaint();
+            }
+
             @Override
             public void mouseClicked(MouseEvent e) {
+
                 if (e.getClickCount() == 2) {
                     editSelectedPatient();
                 }
@@ -259,6 +350,8 @@ public class PatientPanel extends JPanel {
         );
 
         scrollPane.getViewport().setBackground(WHITE);
+
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
 
         JPanel tableContainer = new JPanel(new BorderLayout());
         tableContainer.setBackground(WHITE);
@@ -335,6 +428,7 @@ public class PatientPanel extends JPanel {
         );
 
         statistics.setBackground(BACKGROUND);
+
         statistics.setMaximumSize(
                 new Dimension(Integer.MAX_VALUE, 100)
         );
@@ -351,21 +445,21 @@ public class PatientPanel extends JPanel {
                 "TOTAL PATIENTS",
                 totalPatientsValue,
                 "Registered in the system",
-                TEAL
+                new Color(30, 105, 190)
         ));
 
         statistics.add(createStatCard(
                 "WITH MEDICAL RECORDS",
                 withRecordsValue,
                 "Patients with clinical history",
-                new Color(54, 132, 111)
+                new Color(35, 132, 94)
         ));
 
         statistics.add(createStatCard(
                 "WITHOUT MEDICAL RECORDS",
                 withoutRecordsValue,
                 "Patients without clinical history",
-                new Color(190, 139, 65)
+                new Color(210, 120, 42)
         ));
 
         return statistics;
@@ -378,21 +472,48 @@ public class PatientPanel extends JPanel {
             Color accent
     ) {
 
-        JPanel card = new JPanel(new BorderLayout(12, 0));
-        card.setBackground(WHITE);
+        JPanel card = new JPanel(new BorderLayout(12, 0)) {
+
+            @Override
+            protected void paintComponent(Graphics g) {
+
+                Graphics2D g2 = (Graphics2D) g.create();
+
+                g2.setRenderingHint(
+                        RenderingHints.KEY_ANTIALIASING,
+                        RenderingHints.VALUE_ANTIALIAS_ON
+                );
+
+                Color start = accent;
+                Color end = accent.brighter();
+
+                g2.setPaint(
+                        new GradientPaint(
+                                0, 0, start,
+                                getWidth(), getHeight(), end
+                        )
+                );
+
+                g2.fillRoundRect(
+                        0, 0,
+                        getWidth(), getHeight(),
+                        18, 18
+                );
+
+                g2.dispose();
+
+                super.paintComponent(g);
+            }
+        };
+
+        card.setOpaque(false);
 
         card.setBorder(
-                BorderFactory.createCompoundBorder(
-                        new LineBorder(BORDER, 1),
-                        new EmptyBorder(13, 15, 13, 15)
-                )
+                new EmptyBorder(13, 19, 13, 19)
         );
 
-        JPanel accentBar = new JPanel();
-        accentBar.setBackground(accent);
-        accentBar.setPreferredSize(new Dimension(4, 0));
-
         JPanel details = new JPanel();
+
         details.setOpaque(false);
 
         details.setLayout(new BoxLayout(
@@ -400,21 +521,30 @@ public class PatientPanel extends JPanel {
         ));
 
         JLabel titleLabel = new JLabel(title);
+
         titleLabel.setFont(
                 new Font("SansSerif", Font.BOLD, 10)
         );
-        titleLabel.setForeground(MUTED);
+
+        titleLabel.setForeground(
+                new Color(255, 255, 255, 225)
+        );
 
         valueLabel.setFont(
-                new Font("SansSerif", Font.BOLD, 25)
+                new Font("SansSerif", Font.BOLD, 29)
         );
-        valueLabel.setForeground(TEXT);
+
+        valueLabel.setForeground(WHITE);
 
         JLabel descriptionLabel = new JLabel(description);
+
         descriptionLabel.setFont(
                 new Font("SansSerif", Font.PLAIN, 10)
         );
-        descriptionLabel.setForeground(MUTED);
+
+        descriptionLabel.setForeground(
+                new Color(255, 255, 255, 225)
+        );
 
         details.add(titleLabel);
         details.add(Box.createVerticalStrut(3));
@@ -422,7 +552,6 @@ public class PatientPanel extends JPanel {
         details.add(Box.createVerticalStrut(2));
         details.add(descriptionLabel);
 
-        card.add(accentBar, BorderLayout.WEST);
         card.add(details, BorderLayout.CENTER);
 
         return card;
@@ -447,6 +576,7 @@ public class PatientPanel extends JPanel {
         searchPanel.setBackground(WHITE);
 
         searchField = new JTextField();
+
         searchField.setFont(
                 new Font("SansSerif", Font.PLAIN, 13)
         );
