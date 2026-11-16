@@ -5,6 +5,8 @@ import dao.PatientDAO;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.time.LocalDate;
@@ -20,6 +22,10 @@ public class MedicalRecordPanel extends JPanel {
     private static final Color MUTED = new Color(112, 132, 134);
     private static final Color WHITE = Color.WHITE;
     private static final Color BORDER = new Color(225, 233, 231);
+
+    private static final Color BLUE = new Color(45, 105, 166);
+    private static final Color GREEN = new Color(42, 132, 105);
+    private static final Color ORANGE = new Color(195, 126, 54);
 
     private final int currentDoctorId;
     private final String currentDoctorName;
@@ -104,7 +110,7 @@ public class MedicalRecordPanel extends JPanel {
                 createDetailsPanel()
         );
 
-        splitPane.setResizeWeight(0.68);
+        splitPane.setResizeWeight(0.62);
         splitPane.setDividerSize(7);
         splitPane.setBorder(null);
         splitPane.setBackground(BACKGROUND);
@@ -126,43 +132,88 @@ public class MedicalRecordPanel extends JPanel {
         latestRecordLabel = new JLabel("None");
 
         panel.add(createStatCard(
-                "Records for Selected Patient",
-                totalRecordsLabel
+                "RECORD VOLUME",
+                "Records for selected patient",
+                totalRecordsLabel,
+                BLUE,
+                "\u2630"
         ));
 
         panel.add(createStatCard(
-                "Selected Patient",
-                selectedPatientLabel
+                "PATIENT PROFILE",
+                "Currently selected patient",
+                selectedPatientLabel,
+                GREEN,
+                "\u263A"
         ));
 
         panel.add(createStatCard(
-                "Latest Record",
-                latestRecordLabel
+                "LATEST ACTIVITY",
+                "Most recent medical record",
+                latestRecordLabel,
+                ORANGE,
+                "\u21BB"
         ));
 
         return panel;
     }
 
-    private JPanel createStatCard(String title, JLabel valueLabel) {
+    private JPanel createStatCard(
+            String title,
+            String description,
+            JLabel valueLabel,
+            Color accent,
+            String symbol
+    ) {
 
-        JPanel card = new JPanel();
-        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
+        JPanel card = new JPanel(new BorderLayout(12, 0));
         card.setBackground(WHITE);
+
         card.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(BORDER),
-                new EmptyBorder(15, 17, 15, 17)
+                new LineBorder(BORDER, 1),
+                new EmptyBorder(13, 15, 13, 15)
         ));
 
-        JLabel heading = new JLabel(title);
-        heading.setFont(new Font("SansSerif", Font.PLAIN, 12));
-        heading.setForeground(MUTED);
+        JPanel iconPanel = new JPanel(new GridBagLayout());
+        iconPanel.setPreferredSize(new Dimension(43, 43));
+        iconPanel.setBackground(new Color(
+                accent.getRed(),
+                accent.getGreen(),
+                accent.getBlue(),
+                25
+        ));
 
-        valueLabel.setFont(new Font("SansSerif", Font.BOLD, 21));
+        JLabel icon = new JLabel(symbol);
+        icon.setFont(new Font("SansSerif", Font.BOLD, 19));
+        icon.setForeground(accent);
+
+        iconPanel.add(icon);
+
+        JPanel details = new JPanel();
+        details.setOpaque(false);
+        details.setLayout(new BoxLayout(details, BoxLayout.Y_AXIS));
+
+        JLabel heading = new JLabel(title);
+        heading.setFont(new Font("SansSerif", Font.BOLD, 10));
+        heading.setForeground(accent);
+
+        valueLabel.setFont(new Font("SansSerif", Font.BOLD, 19));
         valueLabel.setForeground(DARK);
 
-        card.add(heading);
-        card.add(Box.createVerticalStrut(9));
-        card.add(valueLabel);
+        valueLabel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 27));
+
+        JLabel descriptionLabel = new JLabel(description);
+        descriptionLabel.setFont(new Font("SansSerif", Font.PLAIN, 10));
+        descriptionLabel.setForeground(MUTED);
+
+        details.add(heading);
+        details.add(Box.createVerticalStrut(5));
+        details.add(valueLabel);
+        details.add(Box.createVerticalStrut(3));
+        details.add(descriptionLabel);
+
+        card.add(iconPanel, BorderLayout.WEST);
+        card.add(details, BorderLayout.CENTER);
 
         return card;
     }
@@ -172,7 +223,7 @@ public class MedicalRecordPanel extends JPanel {
         JPanel panel = new JPanel(new BorderLayout(12, 0));
         panel.setBackground(WHITE);
         panel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(BORDER),
+                new LineBorder(BORDER, 1),
                 new EmptyBorder(12, 14, 12, 14)
         ));
 
@@ -181,12 +232,12 @@ public class MedicalRecordPanel extends JPanel {
         ));
         left.setOpaque(false);
 
-        JLabel patientLabel = new JLabel("Patient:");
-        patientLabel.setForeground(TEXT);
-        patientLabel.setFont(new Font("SansSerif", Font.BOLD, 13));
+        JLabel patientLabel = new JLabel("PATIENT");
+        patientLabel.setForeground(MUTED);
+        patientLabel.setFont(new Font("SansSerif", Font.BOLD, 11));
 
         patientComboBox = new JComboBox<>();
-        patientComboBox.setPreferredSize(new Dimension(230, 34));
+        patientComboBox.setPreferredSize(new Dimension(230, 35));
         patientComboBox.setFont(new Font("SansSerif", Font.PLAIN, 13));
 
         patientComboBox.addActionListener(e -> loadRecords());
@@ -202,7 +253,10 @@ public class MedicalRecordPanel extends JPanel {
         JButton addButton = createButton("Add Record", TEAL);
         editButton = createButton("Edit", DARK);
         deleteButton = createButton("Delete", new Color(180, 65, 65));
-        JButton refreshButton = createButton("Refresh", new Color(85, 105, 108));
+        JButton refreshButton = createButton(
+                "Refresh",
+                new Color(85, 105, 108)
+        );
 
         editButton.setEnabled(false);
         deleteButton.setEnabled(false);
@@ -225,16 +279,39 @@ public class MedicalRecordPanel extends JPanel {
 
     private JPanel createTablePanel() {
 
-        JPanel panel = new JPanel(new BorderLayout(0, 10));
+        JPanel panel = new JPanel(new BorderLayout(0, 11));
         panel.setBackground(WHITE);
+
         panel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(BORDER),
+                new LineBorder(BORDER, 1),
                 new EmptyBorder(14, 15, 14, 15)
         ));
+
+        JPanel headingPanel = new JPanel(new BorderLayout());
+        headingPanel.setOpaque(false);
 
         JLabel heading = new JLabel("Medical History");
         heading.setFont(new Font("SansSerif", Font.BOLD, 16));
         heading.setForeground(DARK);
+
+        JLabel subtitle = new JLabel(
+                "Select a record to inspect its clinical information"
+        );
+        subtitle.setFont(new Font("SansSerif", Font.PLAIN, 11));
+        subtitle.setForeground(MUTED);
+
+        JPanel headingText = new JPanel();
+        headingText.setOpaque(false);
+        headingText.setLayout(new BoxLayout(
+                headingText,
+                BoxLayout.Y_AXIS
+        ));
+
+        headingText.add(heading);
+        headingText.add(Box.createVerticalStrut(4));
+        headingText.add(subtitle);
+
+        headingPanel.add(headingText, BorderLayout.WEST);
 
         String[] columns = {
                 "Record ID",
@@ -253,25 +330,127 @@ public class MedicalRecordPanel extends JPanel {
         };
 
         recordsTable = new JTable(tableModel);
-        recordsTable.setRowHeight(34);
-        recordsTable.setFont(new Font("SansSerif", Font.PLAIN, 12));
+
+        recordsTable.setFont(
+                new Font("SansSerif", Font.PLAIN, 12)
+        );
+
         recordsTable.setForeground(TEXT);
-        recordsTable.setSelectionBackground(new Color(218, 239, 235));
+        recordsTable.setBackground(WHITE);
+        recordsTable.setRowHeight(43);
+
+        recordsTable.setSelectionBackground(
+                new Color(218, 239, 235)
+        );
+
         recordsTable.setSelectionForeground(DARK);
-        recordsTable.setGridColor(BORDER);
+
         recordsTable.setShowVerticalLines(false);
+        recordsTable.setShowHorizontalLines(true);
+
+        recordsTable.setGridColor(
+                new Color(238, 243, 242)
+        );
+
+        recordsTable.setIntercellSpacing(
+                new Dimension(0, 1)
+        );
+
         recordsTable.setFillsViewportHeight(true);
+        recordsTable.setRowMargin(0);
+
+        recordsTable.setSelectionMode(
+                ListSelectionModel.SINGLE_SELECTION
+        );
 
         recordsTable.getTableHeader().setFont(
-                new Font("SansSerif", Font.BOLD, 12)
+                new Font("SansSerif", Font.BOLD, 11)
         );
+
         recordsTable.getTableHeader().setForeground(DARK);
+
         recordsTable.getTableHeader().setBackground(
-                new Color(239, 245, 243)
+                new Color(237, 244, 242)
         );
+
         recordsTable.getTableHeader().setPreferredSize(
-                new Dimension(0, 36)
+                new Dimension(0, 42)
         );
+
+        recordsTable.getTableHeader().setReorderingAllowed(false);
+
+        recordsTable.getTableHeader().setBorder(
+                BorderFactory.createMatteBorder(
+                        0, 0, 1, 0, BORDER
+                )
+        );
+
+        recordsTable.getColumnModel().getColumn(0)
+                .setPreferredWidth(65);
+
+        recordsTable.getColumnModel().getColumn(1)
+                .setPreferredWidth(95);
+
+        recordsTable.getColumnModel().getColumn(2)
+                .setPreferredWidth(120);
+
+        recordsTable.getColumnModel().getColumn(3)
+                .setPreferredWidth(130);
+
+        recordsTable.getColumnModel().getColumn(4)
+                .setPreferredWidth(190);
+
+        recordsTable.getColumnModel().getColumn(5)
+                .setPreferredWidth(190);
+
+        DefaultTableCellRenderer renderer =
+                new DefaultTableCellRenderer() {
+
+                    @Override
+                    public Component getTableCellRendererComponent(
+                            JTable table,
+                            Object value,
+                            boolean isSelected,
+                            boolean hasFocus,
+                            int row,
+                            int column
+                    ) {
+
+                        Component component =
+                                super.getTableCellRendererComponent(
+                                        table,
+                                        value,
+                                        isSelected,
+                                        hasFocus,
+                                        row,
+                                        column
+                                );
+
+                        if (isSelected) {
+                            component.setBackground(
+                                    new Color(218, 239, 235)
+                            );
+                            component.setForeground(DARK);
+                        } else {
+                            component.setBackground(
+                                    row % 2 == 0
+                                            ? WHITE
+                                            : new Color(248, 251, 250)
+                            );
+                            component.setForeground(TEXT);
+                        }
+
+                        setBorder(new EmptyBorder(0, 12, 0, 8));
+
+                        return component;
+                    }
+                };
+
+        for (int i = 0; i < recordsTable.getColumnCount(); i++) {
+            recordsTable.getColumnModel()
+                    .getColumn(i)
+                    .setCellRenderer(renderer);
+        }
 
         recordsTable.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
@@ -280,9 +459,10 @@ public class MedicalRecordPanel extends JPanel {
         });
 
         JScrollPane scrollPane = new JScrollPane(recordsTable);
-        scrollPane.setBorder(BorderFactory.createLineBorder(BORDER));
+        scrollPane.setBorder(new LineBorder(BORDER, 1));
+        scrollPane.getViewport().setBackground(WHITE);
 
-        panel.add(heading, BorderLayout.NORTH);
+        panel.add(headingPanel, BorderLayout.NORTH);
         panel.add(scrollPane, BorderLayout.CENTER);
 
         return panel;
@@ -290,33 +470,65 @@ public class MedicalRecordPanel extends JPanel {
 
     private JPanel createDetailsPanel() {
 
-        JPanel panel = new JPanel(new BorderLayout(0, 10));
+        JPanel panel = new JPanel(new BorderLayout(0, 12));
         panel.setBackground(WHITE);
+
         panel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(BORDER),
+                new LineBorder(BORDER, 1),
                 new EmptyBorder(14, 15, 14, 15)
         ));
 
-        JLabel heading = new JLabel("Record Details");
+        JPanel headingPanel = new JPanel(new BorderLayout());
+        headingPanel.setOpaque(false);
+
+        JLabel heading = new JLabel("Clinical Record Overview");
         heading.setFont(new Font("SansSerif", Font.BOLD, 16));
         heading.setForeground(DARK);
+
+        JLabel subtitle = new JLabel(
+                "Detailed information for the selected medical record"
+        );
+        subtitle.setFont(new Font("SansSerif", Font.PLAIN, 11));
+        subtitle.setForeground(MUTED);
+
+        JPanel headingText = new JPanel();
+        headingText.setOpaque(false);
+        headingText.setLayout(new BoxLayout(
+                headingText,
+                BoxLayout.Y_AXIS
+        ));
+
+        headingText.add(heading);
+        headingText.add(Box.createVerticalStrut(4));
+        headingText.add(subtitle);
+
+        headingPanel.add(headingText, BorderLayout.WEST);
 
         detailsArea = new JTextArea(
                 "Select a medical record to view its details."
         );
 
-        detailsArea.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        detailsArea.setFont(
+                new Font("SansSerif", Font.PLAIN, 13)
+        );
+
         detailsArea.setForeground(TEXT);
-        detailsArea.setBackground(WHITE);
+        detailsArea.setBackground(new Color(249, 251, 250));
         detailsArea.setEditable(false);
         detailsArea.setLineWrap(true);
         detailsArea.setWrapStyleWord(true);
-        detailsArea.setBorder(new EmptyBorder(5, 5, 5, 5));
+
+        detailsArea.setBorder(
+                new EmptyBorder(15, 17, 15, 17)
+        );
 
         JScrollPane scrollPane = new JScrollPane(detailsArea);
-        scrollPane.setBorder(BorderFactory.createLineBorder(BORDER));
+        scrollPane.setBorder(new LineBorder(BORDER, 1));
+        scrollPane.getViewport().setBackground(
+                new Color(249, 251, 250)
+        );
 
-        panel.add(heading, BorderLayout.NORTH);
+        panel.add(headingPanel, BorderLayout.NORTH);
         panel.add(scrollPane, BorderLayout.CENTER);
 
         return panel;
@@ -480,39 +692,45 @@ public class MedicalRecordPanel extends JPanel {
 
         StringBuilder details = new StringBuilder();
 
-        details.append("Record ID: ")
+        details.append("  RECORD IDENTIFICATION\n");
+        details.append("  Record ID: ")
                 .append(record.get("record_id"))
-                .append("\n\n");
-
-        details.append("Patient: ")
-                .append(record.get("patient_name"))
-                .append("\n\n");
-
-        details.append("Doctor: ")
-                .append(record.get("doctor_name"))
                 .append("\n");
 
-        details.append("Doctor ID: ")
-                .append(recordDoctorId)
-                .append("\n");
-
-        details.append("Specialization: ")
-                .append(record.get("specialization"))
-                .append("\n\n");
-
-        details.append("Record Date: ")
+        details.append("  Record Date: ")
                 .append(record.get("record_date"))
                 .append("\n\n");
 
-        details.append("Diagnosis:\n")
+        details.append("  PATIENT INFORMATION\n");
+        details.append("  Patient Name: ")
+                .append(record.get("patient_name"))
+                .append("\n\n");
+
+        details.append("  PHYSICIAN INFORMATION\n");
+        details.append("  Doctor: ")
+                .append(record.get("doctor_name"))
+                .append("\n");
+
+        details.append("  Doctor ID: ")
+                .append(recordDoctorId)
+                .append("\n");
+
+        details.append("  Specialization: ")
+                .append(record.get("specialization"))
+                .append("\n\n");
+
+        details.append("  DIAGNOSIS\n");
+        details.append("  ")
                 .append(record.get("diagnoses"))
                 .append("\n\n");
 
-        details.append("Treatment:\n")
+        details.append("  TREATMENT PLAN\n");
+        details.append("  ")
                 .append(record.get("treatments"))
                 .append("\n\n");
 
-        details.append("Medical Notes:\n")
+        details.append("  MEDICAL NOTES\n");
+        details.append("  ")
                 .append(record.get("medical_notes"));
 
         detailsArea.setText(details.toString());
