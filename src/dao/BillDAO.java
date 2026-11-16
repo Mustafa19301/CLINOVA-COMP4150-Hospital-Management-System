@@ -10,8 +10,47 @@ import java.util.List;
 
 public class BillDAO {
 
-	//GET ALL UNPAID BILLS
-	public List<Bill> getUnpaidBills() throws SQLException {
+    //Change row into bill object
+    private Bill mapBill(ResultSet rs) throws SQLException {
+
+        int prescriptionId = rs.getInt("prescription_id");
+
+        if (rs.wasNull()) {
+            prescriptionId = 0;
+        }
+
+        return new Bill(
+            rs.getInt("bill_id"),
+            rs.getInt("patient_id"),
+            prescriptionId,
+            rs.getFloat("amount"),
+            rs.getDate("date").toLocalDate(),
+            rs.getString("description"),
+            rs.getString("payment_status")
+        );
+    }
+
+    //Get all bills
+    public List<Bill> getAllBills() throws SQLException {
+
+        List<Bill> bills = new ArrayList<>();
+
+        String sql = "SELECT * FROM Bill ORDER BY `date` DESC";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                bills.add(mapBill(rs));
+            }
+        }
+
+        return bills;
+    }
+
+    //Get all unpaid bills
+    public List<Bill> getUnpaidBills() throws SQLException {
 
         List<Bill> bills = new ArrayList<>();
 
@@ -24,27 +63,14 @@ public class BillDAO {
              ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
-
-                int prescription_id = rs.getInt("prescription_id");
-
-                bills.add(new Bill(
-                    rs.getInt("bill_id"),
-                    rs.getInt("patient_id"),
-                    rs.wasNull() ? 0 : prescription_id,
-                    rs.getFloat("amount"),
-                    rs.getDate("date").toLocalDate(),
-                    rs.getString("description"),
-                    rs.getString("payment_status")
-                ));
+                bills.add(mapBill(rs));
             }
         }
 
         return bills;
     }
 
-
-    
-    //GET ALL BILLS FOR A SPECIFIC PATIENT
+    //Get all bills for a patient
     public List<Bill> getPatientBills(int patient_id)
             throws SQLException {
 
@@ -59,20 +85,8 @@ public class BillDAO {
             stmt.setInt(1, patient_id);
 
             try (ResultSet rs = stmt.executeQuery()) {
-
                 while (rs.next()) {
-
-                    int prescription_id = rs.getInt("prescription_id");
-
-                    bills.add(new Bill(
-                        rs.getInt("bill_id"),
-                        rs.getInt("patient_id"),
-                        rs.wasNull() ? 0 : prescription_id,
-                        rs.getFloat("amount"),
-                        rs.getDate("date").toLocalDate(),
-                        rs.getString("description"),
-                        rs.getString("payment_status")
-                    ));
+                    bills.add(mapBill(rs));
                 }
             }
         }
@@ -80,9 +94,7 @@ public class BillDAO {
         return bills;
     }
 
-
-    
-    //MAKE A NEW BILL
+    //Make a new bill
     public boolean createBill(Bill bill) throws SQLException {
 
         String sql = "INSERT INTO Bill " +
@@ -110,9 +122,7 @@ public class BillDAO {
         }
     }
 
-
-   
-    //UPDATE BILL PAYMENT STATUS
+    //Update payment status
     public boolean updatePaymentStatus(int bill_id, String status)
             throws SQLException {
 
@@ -124,6 +134,20 @@ public class BillDAO {
 
             stmt.setString(1, status);
             stmt.setInt(2, bill_id);
+
+            return stmt.executeUpdate() > 0;
+        }
+    }
+
+    //Delete a bill
+    public boolean deleteBill(int bill_id) throws SQLException {
+
+        String sql = "DELETE FROM Bill WHERE bill_id = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, bill_id);
 
             return stmt.executeUpdate() > 0;
         }
