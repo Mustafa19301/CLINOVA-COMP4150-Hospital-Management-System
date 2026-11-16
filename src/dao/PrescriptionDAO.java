@@ -1,4 +1,3 @@
-
 package dao;
 
 import database.DatabaseConnection;
@@ -7,11 +6,13 @@ import model.Prescription;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class PrescriptionDAO {
 
   
-    //GET PRESCRIPTIONS FOR A SPECIFIC PATIENT
+    //Get prescriptions for a specific patient
     public List<Prescription> getPatientPrescriptions(int patient_id)
             throws SQLException {
 
@@ -49,7 +50,7 @@ public class PrescriptionDAO {
 
 
    
-    //GET ALL PENDING PRESCRIPTIONS
+    //Get all pending prescriptions
     public List<Prescription> getPendingPrescriptions()
             throws SQLException {
 
@@ -82,8 +83,7 @@ public class PrescriptionDAO {
     }
 
 
-    
-    //ADD A NEW PRESCRIPTION
+    //Add a new prescription
     public boolean addPrescription(Prescription prescription)
             throws SQLException {
 
@@ -112,9 +112,7 @@ public class PrescriptionDAO {
         }
     }
 
-
-    
-    //UPDATE PRESCRIPTION STATUS
+    //Update prescription status
     public boolean updatePrescriptionStatus(
             int prescription_id, String status)
             throws SQLException {
@@ -130,5 +128,59 @@ public class PrescriptionDAO {
 
             return stmt.executeUpdate() > 0;
         }
+    }
+
+    //Get all prescriptions with names
+    public List<Map<String, Object>> getAllPrescriptions()
+            throws SQLException {
+
+        String sql = "SELECT pr.prescription_id, " +
+                "pr.`date`, " +
+                "pt.name AS patient_name, " +
+                "doc.name AS doctor_name, " +
+                "m.name AS medication_name, " +
+                "ph.name AS pharmacist_name, " +
+                "pr.status " +
+                "FROM Prescription pr " +
+                "JOIN Patient pt ON pr.patient_id = pt.patient_id " +
+                "JOIN Staff doc ON pr.doctor_id = doc.staff_id " +
+                "JOIN Medication m ON pr.medication_id = m.medication_id " +
+                "LEFT JOIN Staff ph ON pr.pharmacist_id = ph.staff_id " +
+                "ORDER BY pr.`date` DESC";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            return readRows(rs);
+        }
+    }
+
+    private List<Map<String, Object>> readRows(ResultSet rs)
+            throws SQLException {
+
+        List<Map<String, Object>> rows = new ArrayList<>();
+
+        ResultSetMetaData metadata = rs.getMetaData();
+        int columnCount = metadata.getColumnCount();
+
+        while (rs.next()) {
+            Map<String, Object> row = new LinkedHashMap<>();
+
+            for (int i = 1; i <= columnCount; i++) {
+
+                Object value = rs.getObject(i);
+
+                if (value instanceof Date) {
+                    value = ((Date) value).toLocalDate();
+                }
+
+                row.put(metadata.getColumnLabel(i), value);
+            }
+
+            rows.add(row);
+        }
+
+        return rows;
     }
 }
