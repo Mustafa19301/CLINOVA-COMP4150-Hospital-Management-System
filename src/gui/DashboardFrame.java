@@ -3,6 +3,7 @@ package gui;
 import gui.panels.AppointmentPanel;
 import gui.panels.PatientPanel;
 import gui.panels.MedicalRecordPanel;
+import gui.panels.PrescriptionPanel;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -140,6 +141,7 @@ public class DashboardFrame extends JFrame {
             addNavigationItem(sidebar, "Patients", false);
             addNavigationItem(sidebar, "Medical Records", false);
             addNavigationItem(sidebar, "Appointments", false);
+            addNavigationItem(sidebar, "Prescriptions", false);
 
         } else if (role.equals("Nurse")) {
 
@@ -265,6 +267,13 @@ public class DashboardFrame extends JFrame {
             contentPanel.add(
                     new AppointmentPanel(staffId, name, role),
                     "Appointments"
+            );
+        }
+
+        if (role.equals("Doctor") || role.equals("PharmacyStaff")) {
+            contentPanel.add(
+                    new PrescriptionPanel(staffId, name, role),
+                    "Prescriptions"
             );
         }
 
@@ -445,6 +454,12 @@ public class DashboardFrame extends JFrame {
                     "03"
             ));
 
+            grid.add(createModuleCard(
+                    "Prescriptions",
+                    "Write and review patient prescriptions.",
+                    "04"
+            ));
+
         } else if (role.equals("Nurse")) {
 
             grid.add(createModuleCard(
@@ -511,7 +526,8 @@ public class DashboardFrame extends JFrame {
 
         if (title.equals("Patient Directory")
                 || title.equals("Medical Records")
-                || title.equals("Appointments")) {
+                || title.equals("Appointments")
+                || title.equals("Prescriptions")) {
 
             card.setCursor(
                     Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
@@ -528,6 +544,8 @@ public class DashboardFrame extends JFrame {
                         showPage("Medical Records");
                     } else if (title.equals("Appointments")) {
                         showPage("Appointments");
+                    } else if (title.equals("Prescriptions")) {
+                        showPage("Prescriptions");
                     }
                 }
             });
