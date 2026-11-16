@@ -1,3 +1,4 @@
+
 package dao;
 
 import database.DatabaseConnection;
@@ -12,7 +13,7 @@ import java.util.Map;
 public class PrescriptionDAO {
 
   
-    //Get prescriptions for a specific patient
+    //GET PRESCRIPTIONS FOR A SPECIFIC PATIENT
     public List<Prescription> getPatientPrescriptions(int patient_id)
             throws SQLException {
 
@@ -50,7 +51,7 @@ public class PrescriptionDAO {
 
 
    
-    //Get all pending prescriptions
+    //GET ALL PENDING PRESCRIPTIONS
     public List<Prescription> getPendingPrescriptions()
             throws SQLException {
 
@@ -83,7 +84,8 @@ public class PrescriptionDAO {
     }
 
 
-    //Add a new prescription
+    
+    //ADD A NEW PRESCRIPTION
     public boolean addPrescription(Prescription prescription)
             throws SQLException {
 
@@ -112,7 +114,9 @@ public class PrescriptionDAO {
         }
     }
 
-    //Update prescription status
+
+    
+    //UPDATE PRESCRIPTION STATUS
     public boolean updatePrescriptionStatus(
             int prescription_id, String status)
             throws SQLException {
@@ -156,6 +160,22 @@ public class PrescriptionDAO {
         }
     }
 
+    //Get all medications for the dropdown
+    public List<Map<String, Object>> getAllMedications()
+            throws SQLException {
+
+        String sql = "SELECT medication_id, name, price " +
+                     "FROM Medication ORDER BY name";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            return readRows(rs);
+        }
+    }
+
+    //Change rows into maps
     private List<Map<String, Object>> readRows(ResultSet rs)
             throws SQLException {
 
@@ -182,5 +202,39 @@ public class PrescriptionDAO {
         }
 
         return rows;
+    }
+
+    //Dispense a prescription
+    public boolean dispensePrescription(int prescription_id, int pharmacist_id)
+            throws SQLException {
+
+        String sql = "UPDATE Prescription " +
+                     "SET status = 'Dispensed', pharmacist_id = ? " +
+                     "WHERE prescription_id = ? AND status = 'Pending'";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, pharmacist_id);
+            stmt.setInt(2, prescription_id);
+
+            return stmt.executeUpdate() > 0;
+        }
+    }
+
+    //Cancel a pending prescription
+    public boolean cancelPrescription(int prescription_id)
+            throws SQLException {
+
+        String sql = "UPDATE Prescription SET status = 'Cancelled' " +
+                     "WHERE prescription_id = ? AND status = 'Pending'";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, prescription_id);
+
+            return stmt.executeUpdate() > 0;
+        }
     }
 }

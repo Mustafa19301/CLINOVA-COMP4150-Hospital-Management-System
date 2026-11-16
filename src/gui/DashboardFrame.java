@@ -141,6 +141,7 @@ public class DashboardFrame extends JFrame {
             addNavigationItem(sidebar, "Patients", false);
             addNavigationItem(sidebar, "Medical Records", false);
             addNavigationItem(sidebar, "Appointments", false);
+            addNavigationItem(sidebar, "Prescriptions", false);
 
         } else if (role.equals("Nurse")) {
 
@@ -269,9 +270,9 @@ public class DashboardFrame extends JFrame {
             );
         }
 
-        if (role.equals("PharmacyStaff")) {
+        if (role.equals("Doctor") || role.equals("PharmacyStaff")) {
             contentPanel.add(
-                    new PrescriptionPanel(staffId, name),
+                    new PrescriptionPanel(staffId, name, role),
                     "Prescriptions"
             );
         }
@@ -451,6 +452,12 @@ public class DashboardFrame extends JFrame {
                     "Appointments",
                     "Review scheduled patient appointments.",
                     "03"
+            ));
+
+            grid.add(createModuleCard(
+                    "Prescriptions",
+                    "Write and review patient prescriptions.",
+                    "04"
             ));
 
         } else if (role.equals("Nurse")) {
