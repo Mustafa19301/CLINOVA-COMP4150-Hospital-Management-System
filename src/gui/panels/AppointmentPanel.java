@@ -77,14 +77,12 @@ public class AppointmentPanel extends JPanel {
     }
 
     private void initializeUI() {
-
-        JPanel mainPanel = new JPanel(new BorderLayout(0, 18));
+        JPanel mainPanel = new JPanel(new BorderLayout(0, 22));
         mainPanel.setBackground(BACKGROUND);
         mainPanel.setBorder(new EmptyBorder(25, 30, 25, 30));
-
         mainPanel.add(createHeader(), BorderLayout.NORTH);
 
-        JPanel centerPanel = new JPanel(new BorderLayout(0, 18));
+        JPanel centerPanel = new JPanel(new BorderLayout(0, 22));
         centerPanel.setBackground(BACKGROUND);
 
         summaryPanel = createSummaryPanel();
@@ -93,30 +91,28 @@ public class AppointmentPanel extends JPanel {
         centerPanel.add(createAgendaSection(), BorderLayout.CENTER);
 
         mainPanel.add(centerPanel, BorderLayout.CENTER);
-
         add(mainPanel, BorderLayout.CENTER);
     }
 
     private JPanel createHeader() {
-
-        JPanel header = new JPanel(new BorderLayout());
+        JPanel header = new JPanel(new BorderLayout(20, 0));
         header.setBackground(BACKGROUND);
-        header.setBorder(new EmptyBorder(0, 0, 5, 0));
+        header.setBorder(new EmptyBorder(5, 2, 5, 2));
 
         JPanel titlePanel = new JPanel();
-        titlePanel.setLayout(new BoxLayout(titlePanel, BoxLayout.Y_AXIS));
         titlePanel.setOpaque(false);
+        titlePanel.setLayout(new BoxLayout(titlePanel, BoxLayout.Y_AXIS));
 
         JLabel title = new JLabel("Appointment Scheduler");
-        title.setFont(new Font("SansSerif", Font.BOLD, 27));
+        title.setFont(new Font("SansSerif", Font.BOLD, 26));
         title.setForeground(DARK);
 
         JLabel subtitle = new JLabel(
-                "Manage patient appointments and daily schedules"
-        );
-        subtitle.setFont(new Font("SansSerif", Font.PLAIN, 13));
+                "Coordinate patient visits, manage your schedule, and keep appointments on track.");
+        subtitle.setFont(new Font("SansSerif", Font.PLAIN, 12));
         subtitle.setForeground(MUTED);
 
+        titlePanel.add(Box.createVerticalStrut(6));
         titlePanel.add(title);
         titlePanel.add(Box.createVerticalStrut(5));
         titlePanel.add(subtitle);
@@ -124,10 +120,10 @@ public class AppointmentPanel extends JPanel {
         JButton bookButton = createPrimaryButton("+  Book Appointment");
         bookButton.addActionListener(e -> showBookingDialog());
 
-        JButton refreshButton = createSecondaryButton("Refresh");
+        JButton refreshButton = createSecondaryButton("↻  Refresh");
         refreshButton.addActionListener(e -> loadAppointments());
 
-        JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 5));
+        JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 9, 0));
         actions.setOpaque(false);
         actions.add(refreshButton);
         actions.add(bookButton);
@@ -139,29 +135,24 @@ public class AppointmentPanel extends JPanel {
     }
 
     private JPanel createSummaryPanel() {
-
+        // Keep all three statistics together in one shared summary strip.
         JPanel panel = new JPanel(new GridLayout(1, 3, 0, 0));
         panel.setBackground(WHITE);
-
         panel.setBorder(BorderFactory.createCompoundBorder(
                 new LineBorder(BORDER, 1, true),
-                new EmptyBorder(12, 18, 12, 18)
-        ));
+                new EmptyBorder(13, 12, 13, 12)));
 
         panel.add(createSummaryCard(
                 "SCHEDULED", "0", TEAL,
-                new Color(232, 243, 240)
-        ));
+                new Color(232, 243, 240)));
 
         panel.add(createSummaryCard(
                 "COMPLETED", "0", BLUE,
-                new Color(235, 240, 248)
-        ));
+                new Color(235, 240, 248)));
 
         panel.add(createSummaryCard(
                 "CANCELLED", "0", RED,
-                new Color(249, 237, 237)
-        ));
+                new Color(249, 237, 237)));
 
         return panel;
     }
@@ -172,75 +163,84 @@ public class AppointmentPanel extends JPanel {
             Color accent,
             Color lightBackground) {
 
-        JPanel card = new JPanel(new BorderLayout(8, 0));
-        card.setOpaque(false);
-        card.setBorder(new EmptyBorder(3, 12, 3, 12));
+        JPanel segment = new JPanel(new BorderLayout(12, 0));
+        segment.setOpaque(false);
+        segment.setBorder(new EmptyBorder(4, 17, 4, 17));
 
-        JPanel indicator = new JPanel() {
+        JPanel marker = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
+                Graphics2D g2 = (Graphics2D) g.create();
 
-                g.setColor(accent);
-                g.fillOval(0, 0, 10, 10);
+                g2.setRenderingHint(
+                        RenderingHints.KEY_ANTIALIASING,
+                        RenderingHints.VALUE_ANTIALIAS_ON);
+
+                g2.setColor(lightBackground);
+                g2.fillRoundRect(
+                        0, 0, getWidth(), getHeight(), 12, 12);
+
+                g2.setColor(accent);
+                g2.fillRoundRect(
+                        8, 9, 4,
+                        Math.max(8, getHeight() - 18),
+                        4, 4);
+
+                g2.dispose();
             }
 
             @Override
             public Dimension getPreferredSize() {
-                return new Dimension(10, 10);
+                return new Dimension(20, 38);
             }
         };
 
-        indicator.setOpaque(false);
+        marker.setOpaque(false);
 
         JPanel textPanel = new JPanel();
         textPanel.setOpaque(false);
         textPanel.setLayout(new BoxLayout(
-                textPanel, BoxLayout.Y_AXIS
-        ));
+                textPanel, BoxLayout.Y_AXIS));
 
         JLabel title = new JLabel(label);
-        title.setFont(new Font("SansSerif", Font.BOLD, 10));
+        title.setFont(new Font("SansSerif", Font.BOLD, 9));
         title.setForeground(MUTED);
 
         JLabel count = new JLabel(value);
-        count.setFont(new Font("SansSerif", Font.BOLD, 22));
-        count.setForeground(accent);
+        count.setFont(new Font("SansSerif", Font.BOLD, 23));
+        count.setForeground(DARK);
 
         textPanel.add(title);
-        textPanel.add(Box.createVerticalStrut(3));
+        textPanel.add(Box.createVerticalStrut(2));
         textPanel.add(count);
 
-        card.add(indicator, BorderLayout.WEST);
-        card.add(textPanel, BorderLayout.CENTER);
+        segment.add(marker, BorderLayout.WEST);
+        segment.add(textPanel, BorderLayout.CENTER);
 
-        card.putClientProperty("countLabel", count);
+        segment.putClientProperty("countLabel", count);
 
-        return card;
+        return segment;
     }
 
     private JPanel createAgendaSection() {
-
-        JPanel section = new JPanel(new BorderLayout(0, 12));
+        JPanel section = new JPanel(new BorderLayout(0, 15));
         section.setBackground(BACKGROUND);
 
-        JPanel toolbar = new JPanel(new BorderLayout());
+        JPanel toolbar = new JPanel(new BorderLayout(15, 0));
         toolbar.setBackground(BACKGROUND);
 
         JPanel sectionTitle = new JPanel();
         sectionTitle.setOpaque(false);
         sectionTitle.setLayout(new BoxLayout(
-                sectionTitle, BoxLayout.Y_AXIS
-        ));
+                sectionTitle, BoxLayout.Y_AXIS));
 
-        JLabel title = new JLabel("Your Appointment Agenda");
+        JLabel title = new JLabel("Appointment Agenda");
         title.setFont(new Font("SansSerif", Font.BOLD, 19));
         title.setForeground(DARK);
 
         JLabel subtitle = new JLabel(
-                "Appointments assigned to your staff account"
-        );
-        subtitle.setFont(new Font("SansSerif", Font.PLAIN, 12));
+                "A clear view of the appointments assigned to your account");
+        subtitle.setFont(new Font("SansSerif", Font.PLAIN, 11));
         subtitle.setForeground(MUTED);
 
         sectionTitle.add(title);
@@ -248,19 +248,21 @@ public class AppointmentPanel extends JPanel {
         sectionTitle.add(subtitle);
 
         JPanel filters = new JPanel(
-                new FlowLayout(FlowLayout.RIGHT, 8, 0)
-        );
+                new FlowLayout(FlowLayout.RIGHT, 8, 0));
         filters.setOpaque(false);
 
         searchField = new JTextField(15);
         searchField.setFont(new Font("SansSerif", Font.PLAIN, 12));
-        searchField.setPreferredSize(new Dimension(180, 34));
+        searchField.setPreferredSize(new Dimension(185, 36));
         searchField.setToolTipText("Search by patient name");
+        searchField.setBorder(BorderFactory.createCompoundBorder(
+                new LineBorder(BORDER, 1, true),
+                new EmptyBorder(0, 10, 0, 10)));
+
+        searchField.addActionListener(e -> loadAppointments());
 
         JButton searchButton = createSecondaryButton("Search");
         searchButton.addActionListener(e -> loadAppointments());
-
-        searchField.addActionListener(e -> loadAppointments());
 
         statusFilter = new JComboBox<>(new String[]{
                 "All Statuses",
@@ -269,8 +271,9 @@ public class AppointmentPanel extends JPanel {
                 "Cancelled"
         });
 
-        statusFilter.setFont(new Font("SansSerif", Font.PLAIN, 12));
-        statusFilter.setPreferredSize(new Dimension(135, 34));
+        statusFilter.setFont(new Font("SansSerif", Font.PLAIN, 11));
+        statusFilter.setPreferredSize(new Dimension(138, 36));
+        statusFilter.setBackground(WHITE);
         statusFilter.addActionListener(e -> renderAgenda());
 
         filters.add(searchField);
@@ -282,23 +285,25 @@ public class AppointmentPanel extends JPanel {
 
         agendaPanel = new JPanel();
         agendaPanel.setLayout(new BoxLayout(
-                agendaPanel, BoxLayout.Y_AXIS
-        ));
+                agendaPanel, BoxLayout.Y_AXIS));
         agendaPanel.setBackground(BACKGROUND);
+        agendaPanel.setBorder(new EmptyBorder(2, 1, 12, 1));
 
         JScrollPane scrollPane = new JScrollPane(agendaPanel);
-        scrollPane.setBorder(null);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
         scrollPane.getViewport().setBackground(BACKGROUND);
-        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(18);
+        scrollPane.getVerticalScrollBar().setPreferredSize(
+                new Dimension(8, 0));
 
         appointmentCountLabel = new JLabel("0 appointments");
         appointmentCountLabel.setFont(
-                new Font("SansSerif", Font.PLAIN, 12)
-        );
+                new Font("SansSerif", Font.BOLD, 10));
         appointmentCountLabel.setForeground(MUTED);
 
         JPanel footer = new JPanel(new BorderLayout());
         footer.setOpaque(false);
+        footer.setBorder(new EmptyBorder(4, 2, 0, 2));
         footer.add(appointmentCountLabel, BorderLayout.WEST);
 
         section.add(toolbar, BorderLayout.NORTH);
@@ -433,35 +438,32 @@ public class AppointmentPanel extends JPanel {
             emptyPanel.setBackground(WHITE);
             emptyPanel.setBorder(BorderFactory.createCompoundBorder(
                     new LineBorder(BORDER, 1, true),
-                    new EmptyBorder(45, 20, 45, 20)
-            ));
-            emptyPanel.setLayout(new BoxLayout(
-                    emptyPanel, BoxLayout.Y_AXIS
+                    new EmptyBorder(42, 20, 42, 20)
             ));
 
-            JLabel icon = new JLabel("CALENDAR");
-            icon.setFont(new Font("SansSerif", Font.BOLD, 13));
+            emptyPanel.setLayout(new BoxLayout(
+                    emptyPanel, BoxLayout.Y_AXIS));
+
+            JLabel icon = new JLabel("▦");
+            icon.setFont(new Font("SansSerif", Font.PLAIN, 30));
             icon.setForeground(TEAL);
             icon.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-            JLabel message = new JLabel(
-                    "No appointments found"
-            );
-            message.setFont(new Font("SansSerif", Font.BOLD, 17));
+            JLabel message = new JLabel("No appointments found");
+            message.setFont(new Font("SansSerif", Font.BOLD, 16));
             message.setForeground(DARK);
             message.setAlignmentX(Component.CENTER_ALIGNMENT);
 
             JLabel hint = new JLabel(
-                    "Try changing your filters or book a new appointment."
-            );
-            hint.setFont(new Font("SansSerif", Font.PLAIN, 12));
+                    "Your agenda is clear. Try adjusting the filters or book a new visit.");
+            hint.setFont(new Font("SansSerif", Font.PLAIN, 11));
             hint.setForeground(MUTED);
             hint.setAlignmentX(Component.CENTER_ALIGNMENT);
 
             emptyPanel.add(icon);
-            emptyPanel.add(Box.createVerticalStrut(12));
+            emptyPanel.add(Box.createVerticalStrut(10));
             emptyPanel.add(message);
-            emptyPanel.add(Box.createVerticalStrut(7));
+            emptyPanel.add(Box.createVerticalStrut(6));
             emptyPanel.add(hint);
 
             agendaPanel.add(emptyPanel);
@@ -497,30 +499,36 @@ public class AppointmentPanel extends JPanel {
     }
 
     private JPanel createDateHeader(LocalDate date) {
-
         JPanel panel = new JPanel(new BorderLayout());
         panel.setOpaque(false);
-        panel.setBorder(new EmptyBorder(5, 2, 4, 2));
+        panel.setBorder(new EmptyBorder(8, 3, 8, 3));
 
-        String dateText = date.format(
-                DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy")
-        );
-
-        JLabel label = new JLabel(dateText);
-        label.setFont(new Font("SansSerif", Font.BOLD, 14));
+        JLabel label = new JLabel(date.format(
+                DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy")));
+        label.setFont(new Font("SansSerif", Font.BOLD, 13));
         label.setForeground(DARK);
 
-        JLabel todayLabel = new JLabel(
-                date.equals(LocalDate.now()) ? "TODAY" : ""
-        );
+        JPanel right = new JPanel(
+                new FlowLayout(FlowLayout.RIGHT, 8, 0));
+        right.setOpaque(false);
 
-        todayLabel.setFont(
-                new Font("SansSerif", Font.BOLD, 10)
-        );
-        todayLabel.setForeground(TEAL);
+        JLabel schedule = new JLabel("DAILY SCHEDULE");
+        schedule.setFont(new Font("SansSerif", Font.BOLD, 8));
+        schedule.setForeground(MUTED);
+        right.add(schedule);
+
+        if (date.equals(LocalDate.now())) {
+            JLabel today = new JLabel("TODAY");
+            today.setFont(new Font("SansSerif", Font.BOLD, 9));
+            today.setForeground(TEAL);
+            today.setOpaque(true);
+            today.setBackground(LIGHT_TEAL);
+            today.setBorder(new EmptyBorder(4, 8, 4, 8));
+            right.add(today);
+        }
 
         panel.add(label, BorderLayout.WEST);
-        panel.add(todayLabel, BorderLayout.EAST);
+        panel.add(right, BorderLayout.EAST);
 
         return panel;
     }
@@ -528,141 +536,152 @@ public class AppointmentPanel extends JPanel {
     private JPanel createAppointmentCard(
             Map<String, Object> appointment) {
 
-        JPanel card = new JPanel(new BorderLayout(15, 0));
+        JPanel card = new JPanel(new BorderLayout(17, 0));
         card.setBackground(WHITE);
-
         card.setBorder(BorderFactory.createCompoundBorder(
                 new LineBorder(BORDER, 1, true),
-                new EmptyBorder(14, 16, 14, 16)
-        ));
-
-        JPanel timePanel = new JPanel();
-        timePanel.setOpaque(false);
-        timePanel.setPreferredSize(new Dimension(85, 60));
-        timePanel.setLayout(new BoxLayout(
-                timePanel, BoxLayout.Y_AXIS
-        ));
+                new EmptyBorder(13, 15, 13, 15)));
 
         LocalTime time = getTime(
-                appointment.get("appointment_time")
-        );
+                appointment.get("appointment_time"));
+
+        JPanel timePanel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+
+                g2.setRenderingHint(
+                        RenderingHints.KEY_ANTIALIASING,
+                        RenderingHints.VALUE_ANTIALIAS_ON);
+
+                g2.setColor(LIGHT_TEAL);
+                g2.fillRoundRect(
+                        0, 0, getWidth(), getHeight(), 13, 13);
+
+                g2.dispose();
+            }
+        };
+
+        timePanel.setOpaque(false);
+        timePanel.setPreferredSize(new Dimension(96, 76));
+        timePanel.setLayout(new BoxLayout(
+                timePanel, BoxLayout.Y_AXIS));
 
         JLabel timeLabel = new JLabel(
-                time == null ? "--:--" : time.format(TIME_FORMAT)
-        );
+                time == null
+                        ? "--:--"
+                        : time.format(
+                        DateTimeFormatter.ofPattern("h:mm a")));
 
         timeLabel.setFont(new Font("SansSerif", Font.BOLD, 17));
         timeLabel.setForeground(TEAL);
+        timeLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        JLabel timeCaption = new JLabel("APPOINTMENT");
-        timeCaption.setFont(
-                new Font("SansSerif", Font.BOLD, 8)
-        );
+        JLabel timeCaption = new JLabel("VISIT TIME");
+        timeCaption.setFont(new Font("SansSerif", Font.BOLD, 8));
         timeCaption.setForeground(MUTED);
+        timeCaption.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         timePanel.add(Box.createVerticalGlue());
         timePanel.add(timeLabel);
-        timePanel.add(Box.createVerticalStrut(4));
+        timePanel.add(Box.createVerticalStrut(5));
         timePanel.add(timeCaption);
         timePanel.add(Box.createVerticalGlue());
 
         JPanel details = new JPanel();
         details.setOpaque(false);
         details.setLayout(new BoxLayout(
-                details, BoxLayout.Y_AXIS
-        ));
+                details, BoxLayout.Y_AXIS));
 
         JLabel patientName = new JLabel(
-                getString(appointment, "patient_name")
-        );
+                getString(appointment, "patient_name"));
 
         patientName.setFont(
-                new Font("SansSerif", Font.BOLD, 15)
-        );
+                new Font("SansSerif", Font.BOLD, 15));
         patientName.setForeground(DARK);
 
-        JLabel reason = new JLabel(
-                getString(appointment, "reason").isEmpty()
-                        ? "No reason provided"
-                        : getString(appointment, "reason")
-        );
+        String reasonText = getString(
+                appointment, "reason").isEmpty()
+                ? "No reason provided"
+                : getString(appointment, "reason");
 
-        reason.setFont(
-                new Font("SansSerif", Font.PLAIN, 12)
-        );
+        JLabel reason = new JLabel(reasonText);
+        reason.setFont(new Font("SansSerif", Font.PLAIN, 12));
         reason.setForeground(TEXT);
 
         JLabel staff = new JLabel(
-                getString(appointment, "doctor_name") +
-                        "   •   " +
-                        getString(appointment, "nurse_name")
-        );
+                "DOCTOR  "
+                        + getString(appointment, "doctor_name")
+                        + "     |     NURSE  "
+                        + getString(appointment, "nurse_name"));
 
-        staff.setFont(
-                new Font("SansSerif", Font.PLAIN, 11)
-        );
+        staff.setFont(new Font("SansSerif", Font.PLAIN, 10));
         staff.setForeground(MUTED);
 
+        details.add(Box.createVerticalGlue());
         details.add(patientName);
-        details.add(Box.createVerticalStrut(5));
+        details.add(Box.createVerticalStrut(6));
         details.add(reason);
-        details.add(Box.createVerticalStrut(7));
+        details.add(Box.createVerticalStrut(8));
         details.add(staff);
+        details.add(Box.createVerticalGlue());
 
-        JPanel rightPanel = new JPanel(new BorderLayout());
+        JPanel rightPanel = new JPanel();
         rightPanel.setOpaque(false);
-        rightPanel.setPreferredSize(new Dimension(230, 75));
+        rightPanel.setLayout(new BoxLayout(
+                rightPanel, BoxLayout.Y_AXIS));
 
         String status = getString(appointment, "status");
 
         JLabel statusLabel = createStatusLabel(status);
 
         JPanel statusPanel = new JPanel(
-                new FlowLayout(FlowLayout.RIGHT, 0, 0)
-        );
+                new FlowLayout(FlowLayout.RIGHT, 0, 0));
         statusPanel.setOpaque(false);
         statusPanel.add(statusLabel);
 
         JPanel buttons = new JPanel(
-                new FlowLayout(FlowLayout.RIGHT, 5, 0)
-        );
+                new FlowLayout(FlowLayout.RIGHT, 5, 0));
         buttons.setOpaque(false);
 
         int appointmentId = getInt(
-                appointment, "appointment_id"
-        );
+                appointment, "appointment_id");
 
         if ("Scheduled".equalsIgnoreCase(status)) {
+
             JButton editButton = createSmallButton("Edit");
-            editButton.addActionListener(e -> showEditDialog(appointment));
+            editButton.addActionListener(
+                    e -> showEditDialog(appointment));
 
             JButton completeButton = createSmallButton("Complete");
+            completeButton.setForeground(GREEN);
             completeButton.addActionListener(e ->
-                    changeStatus(appointmentId, "Completed")
-            );
+                    changeStatus(appointmentId, "Completed"));
 
             JButton cancelButton = createSmallButton("Cancel");
             cancelButton.setForeground(RED);
             cancelButton.addActionListener(e ->
-                    cancelAppointment(appointmentId)
-            );
+                    cancelAppointment(appointmentId));
 
             buttons.add(editButton);
             buttons.add(completeButton);
             buttons.add(cancelButton);
-
-            rightPanel.add(buttons, BorderLayout.NORTH);
         }
 
-        rightPanel.add(statusPanel, BorderLayout.CENTER);
+        rightPanel.add(statusPanel);
+        rightPanel.add(Box.createVerticalGlue());
+
+        if ("Scheduled".equalsIgnoreCase(status)) {
+            rightPanel.add(buttons);
+        }
 
         card.add(timePanel, BorderLayout.WEST);
         card.add(details, BorderLayout.CENTER);
         card.add(rightPanel, BorderLayout.EAST);
 
         card.setMaximumSize(
-                new Dimension(Integer.MAX_VALUE, 115)
-        );
+                new Dimension(Integer.MAX_VALUE, 112));
+        card.setPreferredSize(new Dimension(900, 108));
 
         return card;
     }
@@ -685,12 +704,12 @@ public class AppointmentPanel extends JPanel {
             background = new Color(232, 243, 240);
         }
 
-        JLabel label = new JLabel(status);
-        label.setFont(new Font("SansSerif", Font.BOLD, 10));
+        JLabel label = new JLabel(status.toUpperCase());
+        label.setFont(new Font("SansSerif", Font.BOLD, 9));
         label.setForeground(foreground);
         label.setOpaque(true);
         label.setBackground(background);
-        label.setBorder(new EmptyBorder(5, 9, 5, 9));
+        label.setBorder(new EmptyBorder(5, 10, 5, 10));
 
         return label;
     }
@@ -740,7 +759,6 @@ public class AppointmentPanel extends JPanel {
                     new Font("SansSerif", Font.PLAIN, 12)
             );
 
-
             if ("Doctor".equals(currentRole)) {
 
                 selectStaff(doctorBox, currentStaffId);
@@ -783,7 +801,8 @@ public class AppointmentPanel extends JPanel {
                     (StaffOption) nurseBox.getSelectedItem();
 
             if (patient == null || doctor == null || nurse == null) {
-                showError("Please select a patient, doctor, and nurse.");
+                showError(
+                        "Please select a patient, doctor, and nurse.");
                 return;
             }
 
@@ -947,7 +966,8 @@ public class AppointmentPanel extends JPanel {
                     (StaffOption) nurseBox.getSelectedItem();
 
             if (patient == null || doctor == null || nurse == null) {
-                showError("Please select all required staff and patient details.");
+                showError(
+                        "Please select all required staff and patient details.");
                 return;
             }
 
@@ -1002,11 +1022,9 @@ public class AppointmentPanel extends JPanel {
     }
 
     private JPanel createAppointmentForm() {
-
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBackground(WHITE);
-        panel.setBorder(new EmptyBorder(12, 12, 12, 12));
-
+        panel.setBorder(new EmptyBorder(16, 17, 16, 17));
         return panel;
     }
 
@@ -1018,16 +1036,13 @@ public class AppointmentPanel extends JPanel {
 
         GridBagConstraints gbc = new GridBagConstraints();
 
-        gbc.insets = new Insets(7, 5, 7, 10);
+        gbc.insets = new Insets(8, 5, 8, 12);
         gbc.anchor = GridBagConstraints.WEST;
-
         gbc.gridx = 0;
         gbc.gridy = row;
 
         JLabel fieldLabel = new JLabel(label);
-        fieldLabel.setFont(
-                new Font("SansSerif", Font.BOLD, 12)
-        );
+        fieldLabel.setFont(new Font("SansSerif", Font.BOLD, 11));
         fieldLabel.setForeground(TEXT);
 
         panel.add(fieldLabel, gbc);
@@ -1035,11 +1050,22 @@ public class AppointmentPanel extends JPanel {
         gbc.gridx = 1;
         gbc.weightx = 1;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(7, 5, 7, 5);
+        gbc.insets = new Insets(8, 5, 8, 5);
 
         component.setFont(
-                new Font("SansSerif", Font.PLAIN, 12)
-        );
+                new Font("SansSerif", Font.PLAIN, 12));
+
+        if (component instanceof JTextField) {
+            component.setBorder(BorderFactory.createCompoundBorder(
+                    new LineBorder(BORDER, 1, true),
+                    new EmptyBorder(7, 9, 7, 9)));
+
+        } else if (component instanceof JComboBox) {
+            component.setBackground(WHITE);
+
+        } else if (component instanceof JScrollPane) {
+            component.setBorder(new LineBorder(BORDER, 1, true));
+        }
 
         panel.add(component, gbc);
     }
@@ -1162,53 +1188,49 @@ public class AppointmentPanel extends JPanel {
     }
 
     private JButton createPrimaryButton(String text) {
-
         JButton button = new JButton(text);
 
         button.setUI(new javax.swing.plaf.basic.BasicButtonUI());
-
-        button.setFont(new Font("SansSerif", Font.BOLD, 12));
+        button.setFont(new Font("SansSerif", Font.BOLD, 11));
         button.setForeground(Color.WHITE);
         button.setBackground(TEAL);
-
         button.setOpaque(true);
         button.setContentAreaFilled(true);
         button.setFocusPainted(false);
         button.setBorderPainted(false);
-
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        button.setBorder(new EmptyBorder(10, 16, 10, 16));
+        button.setBorder(new EmptyBorder(11, 17, 11, 17));
 
         return button;
     }
 
     private JButton createSecondaryButton(String text) {
-
         JButton button = new JButton(text);
+
         button.setFont(new Font("SansSerif", Font.BOLD, 11));
         button.setForeground(TEAL);
         button.setBackground(WHITE);
         button.setFocusPainted(false);
-        button.setBorder(new LineBorder(BORDER, 1, true));
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
         button.setBorder(BorderFactory.createCompoundBorder(
                 new LineBorder(BORDER, 1, true),
-                new EmptyBorder(8, 12, 8, 12)
-        ));
+                new EmptyBorder(9, 13, 9, 13)));
 
         return button;
     }
 
     private JButton createSmallButton(String text) {
-
         JButton button = new JButton(text);
-        button.setFont(new Font("SansSerif", Font.BOLD, 10));
+
+        button.setFont(new Font("SansSerif", Font.BOLD, 9));
         button.setForeground(TEAL);
         button.setBackground(WHITE);
         button.setFocusPainted(false);
-        button.setBorder(new LineBorder(BORDER, 1, true));
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        button.setMargin(new Insets(4, 7, 4, 7));
+        button.setBorder(BorderFactory.createCompoundBorder(
+                new LineBorder(BORDER, 1, true),
+                new EmptyBorder(6, 9, 6, 9)));
+        button.setMargin(new Insets(2, 4, 2, 4));
 
         return button;
     }
