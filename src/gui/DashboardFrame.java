@@ -4,6 +4,7 @@ import gui.panels.AppointmentPanel;
 import gui.panels.PatientPanel;
 import gui.panels.MedicalRecordPanel;
 import gui.panels.PrescriptionPanel;
+import gui.panels.BillPanel;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -296,6 +297,13 @@ public class DashboardFrame extends JFrame {
                     "Prescriptions"
             );
         }
+        
+        if(role.equals("PharmacyStaff") || role.equals("Patient")) {
+        	contentPanel.add(
+        		new BillPanel(),
+        		"Billing"
+        	);
+        }
 
         return contentPanel;
     }
@@ -547,7 +555,8 @@ public class DashboardFrame extends JFrame {
         if (title.equals("Patient Directory")
                 || title.equals("Medical Records")
                 || title.equals("Appointments")
-                || title.equals("Prescriptions")) {
+                || title.equals("Prescriptions")
+                || title.equals("Billing")) {
 
             card.setCursor(
                     Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
@@ -566,6 +575,8 @@ public class DashboardFrame extends JFrame {
                         showPage("Appointments");
                     } else if (title.equals("Prescriptions")) {
                         showPage("Prescriptions");
+                    } else if (title.equals("Billing")) {
+                    	showPage("Billing");
                     }
                 }
             });
