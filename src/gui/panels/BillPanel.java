@@ -1,16 +1,14 @@
-
 package gui.panels;
 
 import dao.BillDAO;
 import dao.PatientDAO;
-import dao.PrescriptionDAO;
 import model.Bill;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,11 +24,12 @@ public class BillPanel extends JPanel {
 
     private final BillDAO billDAO = new BillDAO();
     private final PatientDAO patientDAO = new PatientDAO();
-    private final PrescriptionDAO prescriptionDAO = new PrescriptionDAO();
 
     private JTable billTable;
     private DefaultTableModel tableModel;
     private JTextField searchField;
+
+    private final Map<Integer, String> patientNames = new HashMap<>();
 
     public BillPanel() {
 
@@ -44,9 +43,6 @@ public class BillPanel extends JPanel {
         loadBills();
     }
 
-   
-    //table
-  
     private JPanel createTablePanel() {
 
         JPanel panel = new JPanel(new BorderLayout(0, 10));
@@ -63,7 +59,7 @@ public class BillPanel extends JPanel {
 
         String[] columns = {
                 "Bill ID",
-                "Patient ID",
+                "Patient Name",
                 "Prescription ID",
                 "Amount",
                 "Date",
@@ -83,9 +79,7 @@ public class BillPanel extends JPanel {
         billTable.setRowHeight(34);
         billTable.setFont(new Font("SansSerif", Font.PLAIN, 12));
         billTable.setForeground(TEXT);
-        billTable.setSelectionBackground(
-                new Color(218, 239, 235)
-        );
+        billTable.setSelectionBackground(new Color(218, 239, 235));
         billTable.setSelectionForeground(DARK);
         billTable.setGridColor(BORDER);
         billTable.setShowVerticalLines(false);
@@ -116,19 +110,16 @@ public class BillPanel extends JPanel {
         return panel;
     }
 
-    
-    //Toolbar
-
     private JPanel createToolbar() {
 
         JPanel panel = new JPanel(new BorderLayout(0, 12));
         panel.setBackground(WHITE);
+
         panel.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(BORDER),
                 new EmptyBorder(12, 14, 12, 14)
         ));
 
-        
         JPanel topRow = new JPanel(new BorderLayout(12, 0));
         topRow.setOpaque(false);
 
@@ -136,20 +127,23 @@ public class BillPanel extends JPanel {
         title.setForeground(TEXT);
         title.setFont(new Font("SansSerif", Font.BOLD, 13));
 
-        JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
+        JPanel actions = new JPanel(
+                new FlowLayout(FlowLayout.RIGHT, 8, 0)
+        );
         actions.setOpaque(false);
 
-        
         JButton updateButton = createButton("Update Payment", TEAL);
-        JButton deleteButton = createButton("Delete", new Color(180, 65, 65));
-        JButton refreshButton = createButton("Refresh", new Color(85, 105, 108));
+        JButton deleteButton = createButton(
+                "Delete", new Color(180, 65, 65)
+        );
+        JButton refreshButton = createButton(
+                "Refresh", new Color(85, 105, 108)
+        );
 
-        
         updateButton.addActionListener(e -> updateSelectedPayment());
         deleteButton.addActionListener(e -> deleteSelectedBill());
         refreshButton.addActionListener(e -> loadBills());
 
-        
         actions.add(updateButton);
         actions.add(deleteButton);
         actions.add(refreshButton);
@@ -157,8 +151,9 @@ public class BillPanel extends JPanel {
         topRow.add(title, BorderLayout.WEST);
         topRow.add(actions, BorderLayout.EAST);
 
-       
-        JPanel searchRow = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
+        JPanel searchRow = new JPanel(
+                new FlowLayout(FlowLayout.RIGHT, 8, 0)
+        );
         searchRow.setOpaque(false);
 
         JLabel searchLabel = new JLabel("Patient ID:");
@@ -169,10 +164,13 @@ public class BillPanel extends JPanel {
         searchField.setFont(new Font("SansSerif", Font.PLAIN, 12));
 
         JButton searchButton = createButton("Search", TEAL);
-        JButton clearButton = createButton("Clear", new Color(85, 105, 108));
+        JButton clearButton = createButton(
+                "Clear", new Color(85, 105, 108)
+        );
 
         searchButton.addActionListener(e -> searchBills());
         searchField.addActionListener(e -> searchBills());
+
         clearButton.addActionListener(e -> {
             searchField.setText("");
             loadBills();
@@ -189,13 +187,28 @@ public class BillPanel extends JPanel {
         return panel;
     }
 
+    private void loadPatientNames() throws Exception {
 
-        //Load all bills
-    
+        patientNames.clear();
+
+        for (Map<String, Object> patient : patientDAO.getAllPatients()) {
+
+            int patientId = ((Number)
+                    patient.get("patient_id")).intValue();
+
+            String patientName = String.valueOf(
+                    patient.get("name")
+            );
+
+            patientNames.put(patientId, patientName);
+        }
+    }
 
     private void loadBills() {
 
         try {
+
+            loadPatientNames();
 
             List<Bill> bills = billDAO.getAllBills();
 
@@ -211,7 +224,6 @@ public class BillPanel extends JPanel {
         }
     }
 
-    //search
     private void searchBills() {
 
         String search = searchField.getText().trim();
@@ -224,7 +236,7 @@ public class BillPanel extends JPanel {
         try {
 
             int patientId = Integer.parseInt(search);
-
+            loadPatientNames();
             List<Bill> bills =
                     billDAO.getPatientBills(patientId);
 
@@ -261,9 +273,14 @@ public class BillPanel extends JPanel {
 
     private void addBillRow(Bill bill) {
 
+        String patientName = patientNames.getOrDefault(
+                bill.getPatient_id(),
+                "Unknown Patient"
+        );
+
         tableModel.addRow(new Object[] {
                 bill.getBill_id(),
-                bill.getPatient_id(),
+                patientName,
                 bill.getPrescription_id() == 0
                         ? "N/A"
                         : bill.getPrescription_id(),
@@ -273,168 +290,6 @@ public class BillPanel extends JPanel {
                 bill.getPayment_status()
         });
     }
-
-    
-    //Make new bill
-    
-
-    private void addBill() {
-
-        JComboBox<Option> patientBox = new JComboBox<>();
-        JComboBox<Option> prescriptionBox = new JComboBox<>();
-
-        JTextField amountField = new JTextField(15);
-        JTextField descriptionField = new JTextField(15);
-
-        try {
-
-            
-            for (Map<String, Object> patient
-                    : patientDAO.getAllPatients()) {
-
-                patientBox.addItem(new Option(
-                        ((Number) patient.get("patient_id")).intValue(),
-                        String.valueOf(patient.get("name"))
-                ));
-            }
-
-            
-            prescriptionBox.addItem(
-                    new Option(0, "No prescription")
-            );
-
-            
-            for (Map<String, Object> prescription
-                    : prescriptionDAO.getAllPrescriptions()) {
-
-                int prescriptionId =
-                        ((Number) prescription.get("prescription_id"))
-                                .intValue();
-
-                String patientName =
-                        String.valueOf(prescription.get("patient_name"));
-
-                String medicationName =
-                        String.valueOf(prescription.get("medication_name"));
-
-                prescriptionBox.addItem(new Option(
-                        prescriptionId,
-                        "Prescription #" + prescriptionId
-                                + " - " + patientName
-                                + " (" + medicationName + ")"
-                ));
-            }
-
-        } catch (Exception exception) {
-
-            showError(
-                    "Unable to load patients or prescriptions.",
-                    exception
-            );
-
-            return;
-        }
-
-        JPanel form = new JPanel(
-                new GridLayout(0, 2, 10, 10)
-        );
-
-        form.add(new JLabel("Patient:"));
-        form.add(patientBox);
-
-        form.add(new JLabel("Prescription:"));
-        form.add(prescriptionBox);
-
-        form.add(new JLabel("Amount:"));
-        form.add(amountField);
-
-        form.add(new JLabel("Description:"));
-        form.add(descriptionField);
-
-        int choice = JOptionPane.showConfirmDialog(
-                this,
-                form,
-                "Create New Bill",
-                JOptionPane.OK_CANCEL_OPTION,
-                JOptionPane.PLAIN_MESSAGE
-        );
-
-        if (choice != JOptionPane.OK_OPTION) {
-            return;
-        }
-
-        Option patient =
-                (Option) patientBox.getSelectedItem();
-
-        Option prescription =
-                (Option) prescriptionBox.getSelectedItem();
-
-        if (patient == null) {
-            showError("Please select a patient.");
-            return;
-        }
-
-        float amount;
-
-        try {
-
-            amount = Float.parseFloat(
-                    amountField.getText().trim()
-            );
-
-            if (amount <= 0) {
-                showError("The bill amount must be greater than zero.");
-                return;
-            }
-
-        } catch (NumberFormatException exception) {
-
-            showError("Please enter a valid bill amount.");
-            return;
-        }
-
-        String description =
-                descriptionField.getText().trim();
-
-        if (description.isEmpty()) {
-            showError("Please enter a bill description.");
-            return;
-        }
-
-        int prescriptionId = prescription == null
-                ? 0
-                : prescription.id;
-
-        Bill bill = new Bill(
-                0,
-                patient.id,
-                prescriptionId,
-                amount,
-                LocalDate.now(),
-                description,
-                "Unpaid"
-        );
-
-        try {
-
-            boolean created = billDAO.createBill(bill);
-
-            if (created) {
-                showSuccess("Bill created successfully.");
-                loadBills();
-            } else {
-                showError("The bill could not be created.");
-            }
-
-        } catch (Exception exception) {
-
-            showError("Unable to create bill.", exception);
-        }
-    }
-
-    
-    //Update payment status
-    
 
     private void updateSelectedPayment() {
 
@@ -500,10 +355,6 @@ public class BillPanel extends JPanel {
         }
     }
 
-    
-    //Delete bill
-    
-
     private void deleteSelectedBill() {
 
         int selectedRow = billTable.getSelectedRow();
@@ -519,10 +370,15 @@ public class BillPanel extends JPanel {
         int billId = ((Number)
                 tableModel.getValueAt(modelRow, 0)).intValue();
 
+        String patientName = String.valueOf(
+                tableModel.getValueAt(modelRow, 1)
+        );
+
         int confirmation = JOptionPane.showConfirmDialog(
                 this,
                 "Are you sure you want to delete bill "
-                        + billId + "?\nThis action cannot be undone.",
+                        + billId + " for " + patientName
+                        + "?\nThis action cannot be undone.",
                 "Confirm Bill Deletion",
                 JOptionPane.YES_NO_OPTION,
                 JOptionPane.WARNING_MESSAGE
@@ -549,10 +405,6 @@ public class BillPanel extends JPanel {
         }
     }
 
-    
-    //Refresh
-    
-
     private void refreshCurrentView() {
 
         if (searchField.getText().trim().isEmpty()) {
@@ -561,10 +413,6 @@ public class BillPanel extends JPanel {
             searchBills();
         }
     }
-
-    
-    //Buttons and messages
-   
 
     private JButton createButton(String text, Color color) {
 
@@ -623,25 +471,5 @@ public class BillPanel extends JPanel {
                 "Error",
                 JOptionPane.ERROR_MESSAGE
         );
-    }
-
-    
-    //Dropdown options
-    
-
-    private static class Option {
-
-        private final int id;
-        private final String name;
-
-        private Option(int id, String name) {
-            this.id = id;
-            this.name = name;
-        }
-
-        @Override
-        public String toString() {
-            return name + " (ID: " + id + ")";
-        }
     }
 }
