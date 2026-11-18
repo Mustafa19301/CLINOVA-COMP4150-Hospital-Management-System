@@ -223,8 +223,9 @@ public class PrescriptionPanel extends JPanel {
                     "Pending"
             );
 
-            prescriptionDAO.addPrescription(prescription);
+            prescriptionDAO.addPrescriptionWithBill(prescription);
             loadPrescriptions();
+            JOptionPane.showMessageDialog(this, "Prescription and bill created.");
         } catch (Exception exception) {
             showError("Unable to add prescription.", exception);
         }
@@ -287,6 +288,7 @@ public class PrescriptionPanel extends JPanel {
 
         int confirm = JOptionPane.showConfirmDialog(this,
                 "Cancel prescription " + id + " for " + tableModel.getValueAt(row, 2) + "?\n"
+                        + "Its unpaid bill will also be removed.\n"
                         + "This cannot be undone.",
                 "Confirm Cancel", JOptionPane.YES_NO_OPTION);
 
@@ -295,7 +297,7 @@ public class PrescriptionPanel extends JPanel {
         }
 
         try {
-            if (!prescriptionDAO.cancelPrescription(id)) {
+            if (!prescriptionDAO.cancelPrescriptionAndBill(id)) {
                 JOptionPane.showMessageDialog(this, "This prescription was already changed.");
             }
             loadPrescriptions();
