@@ -113,20 +113,11 @@ public class LoginFrame extends JFrame {
         eyebrow.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JLabel heading = new JLabel(
-                "<html>Better care starts<br>with better<br>coordination.</html>"
+                "<html>Connecting care.<br>Simplifying healthcare.</html>"
         );
         heading.setFont(new Font("SansSerif", Font.BOLD, 36));
         heading.setForeground(Color.WHITE);
         heading.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        JLabel description = new JLabel(
-                "<html>A centralized workspace for managing<br>" +
-                        "patient information, clinical records and<br>" +
-                        "hospital operations.</html>"
-        );
-        description.setFont(new Font("SansSerif", Font.PLAIN, 15));
-        description.setForeground(new Color(195, 216, 214));
-        description.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JPanel security = new JPanel(new FlowLayout(FlowLayout.LEFT, 9, 0));
         security.setOpaque(false);
@@ -149,12 +140,11 @@ public class LoginFrame extends JFrame {
         content.add(Box.createVerticalStrut(20));
         content.add(heading);
         content.add(Box.createVerticalStrut(22));
-        content.add(description);
         content.add(Box.createVerticalStrut(35));
         content.add(security);
         content.add(Box.createVerticalGlue());
 
-        JLabel footer = new JLabel("CAREPOINT  |  INTERNAL STAFF PORTAL");
+        JLabel footer = new JLabel("INTERNAL STAFF PORTAL");
         footer.setFont(new Font("SansSerif", Font.PLAIN, 10));
         footer.setForeground(new Color(155, 185, 183));
 
