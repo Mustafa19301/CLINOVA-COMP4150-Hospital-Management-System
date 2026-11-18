@@ -237,4 +237,92 @@ public class PrescriptionDAO {
             return stmt.executeUpdate() > 0;
         }
     }
+
+    //Add a prescription and its bill together
+    public boolean addPrescriptionWithBill(Prescription prescription)
+            throws SQLException {
+
+        String prescriptionSql = "INSERT INTO Prescription " +
+                     "(patient_id, doctor_id, medication_id, " +
+                     "pharmacist_id, `date`, status) " +
+                     "VALUES (?, ?, ?, NULL, ?, 'Pending')";
+
+        String billSql = "INSERT INTO Bill " +
+                     "(patient_id, prescription_id, amount, `date`, " +
+                     "description, payment_status) " +
+                     "SELECT pr.patient_id, pr.prescription_id, m.price, pr.`date`, " +
+                     "CONCAT(m.name, ' prescription'), 'Unpaid' " +
+                     "FROM Prescription pr " +
+                     "JOIN Medication m ON pr.medication_id = m.medication_id " +
+                     "WHERE pr.prescription_id = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection()) {
+
+            conn.setAutoCommit(false);
+
+            try (PreparedStatement stmt = conn.prepareStatement(
+                         prescriptionSql, Statement.RETURN_GENERATED_KEYS);
+                 PreparedStatement billStmt = conn.prepareStatement(billSql)) {
+
+                stmt.setInt(1, prescription.getPatient_id());
+                stmt.setInt(2, prescription.getDoctor_id());
+                stmt.setInt(3, prescription.getMedication_id());
+                stmt.setDate(4, Date.valueOf(prescription.getDate()));
+                stmt.executeUpdate();
+
+                int newId;
+                try (ResultSet keys = stmt.getGeneratedKeys()) {
+                    keys.next();
+                    newId = keys.getInt(1);
+                }
+
+                billStmt.setInt(1, newId);
+                billStmt.executeUpdate();
+
+                conn.commit();
+                return true;
+
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
+            }
+        }
+    }
+
+    //Cancel a pending prescription and remove its unpaid bill
+    public boolean cancelPrescriptionAndBill(int prescription_id)
+            throws SQLException {
+
+        String cancelSql = "UPDATE Prescription SET status = 'Cancelled' " +
+                     "WHERE prescription_id = ? AND status = 'Pending'";
+
+        String billSql = "DELETE FROM Bill " +
+                     "WHERE prescription_id = ? AND payment_status = 'Unpaid'";
+
+        try (Connection conn = DatabaseConnection.getConnection()) {
+
+            conn.setAutoCommit(false);
+
+            try (PreparedStatement stmt = conn.prepareStatement(cancelSql);
+                 PreparedStatement billStmt = conn.prepareStatement(billSql)) {
+
+                stmt.setInt(1, prescription_id);
+
+                if (stmt.executeUpdate() == 0) {
+                    conn.rollback();
+                    return false;
+                }
+
+                billStmt.setInt(1, prescription_id);
+                billStmt.executeUpdate();
+
+                conn.commit();
+                return true;
+
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
+            }
+        }
+    }
 }
