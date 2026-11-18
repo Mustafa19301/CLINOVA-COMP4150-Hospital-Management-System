@@ -128,7 +128,7 @@ public class BillPanel extends JPanel {
                 new EmptyBorder(12, 14, 12, 14)
         ));
 
-        // Same top-row arrangement as PrescriptionPanel.
+        
         JPanel topRow = new JPanel(new BorderLayout(12, 0));
         topRow.setOpaque(false);
 
@@ -139,17 +139,17 @@ public class BillPanel extends JPanel {
         JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
         actions.setOpaque(false);
 
-        JButton addButton = createButton("New Bill", TEAL);
+        
         JButton updateButton = createButton("Update Payment", TEAL);
         JButton deleteButton = createButton("Delete", new Color(180, 65, 65));
         JButton refreshButton = createButton("Refresh", new Color(85, 105, 108));
 
-        addButton.addActionListener(e -> addBill());
+        
         updateButton.addActionListener(e -> updateSelectedPayment());
         deleteButton.addActionListener(e -> deleteSelectedBill());
         refreshButton.addActionListener(e -> loadBills());
 
-        actions.add(addButton);
+        
         actions.add(updateButton);
         actions.add(deleteButton);
         actions.add(refreshButton);
@@ -157,7 +157,7 @@ public class BillPanel extends JPanel {
         topRow.add(title, BorderLayout.WEST);
         topRow.add(actions, BorderLayout.EAST);
 
-        // Align patient search directly below the action buttons.
+       
         JPanel searchRow = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
         searchRow.setOpaque(false);
 
