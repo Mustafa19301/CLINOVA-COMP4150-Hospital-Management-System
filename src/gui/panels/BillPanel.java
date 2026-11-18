@@ -121,83 +121,76 @@ public class BillPanel extends JPanel {
 
     private JPanel createToolbar() {
 
-        JPanel panel = new JPanel(new BorderLayout(12, 0));
+        JPanel panel = new JPanel(new BorderLayout(0, 12));
         panel.setBackground(WHITE);
-
         panel.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(BORDER),
                 new EmptyBorder(12, 14, 12, 14)
         ));
 
+        // Same top-row arrangement as PrescriptionPanel.
+        JPanel topRow = new JPanel(new BorderLayout(12, 0));
+        topRow.setOpaque(false);
+
         JLabel title = new JLabel("Billing Management");
         title.setForeground(TEXT);
-        title.setFont(new Font("SansSerif", Font.BOLD, 15));
+        title.setFont(new Font("SansSerif", Font.BOLD, 13));
 
-        JPanel right = new JPanel(
-                new FlowLayout(FlowLayout.RIGHT, 8, 0)
-        );
-
-        right.setOpaque(false);
-
-        searchField = new JTextField(10);
-        searchField.setFont(
-                new Font("SansSerif", Font.PLAIN, 12)
-        );
-
-        JButton searchButton = createButton("Search", TEAL);
-        JButton clearButton = createButton(
-                "Clear",
-                new Color(85, 105, 108)
-        );
+        JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
+        actions.setOpaque(false);
 
         JButton addButton = createButton("New Bill", TEAL);
-
-        JButton updateButton = createButton(
-                "Update Payment",
-                TEAL
-        );
-
-        JButton deleteButton = createButton(
-                "Delete",
-                new Color(180, 65, 65)
-        );
-
-        JButton refreshButton = createButton(
-                "Refresh",
-                new Color(85, 105, 108)
-        );
-
-        searchButton.addActionListener(e -> searchBills());
-
-        searchField.addActionListener(e -> searchBills());
-
-        clearButton.addActionListener(e -> {
-            searchField.setText("");
-            loadBills();
-        });
+        JButton updateButton = createButton("Update Payment", TEAL);
+        JButton deleteButton = createButton("Delete", new Color(180, 65, 65));
+        JButton refreshButton = createButton("Refresh", new Color(85, 105, 108));
 
         addButton.addActionListener(e -> addBill());
         updateButton.addActionListener(e -> updateSelectedPayment());
         deleteButton.addActionListener(e -> deleteSelectedBill());
         refreshButton.addActionListener(e -> loadBills());
 
-        right.add(new JLabel("Patient ID:"));
-        right.add(searchField);
-        right.add(searchButton);
-        right.add(clearButton);
-        right.add(addButton);
-        right.add(updateButton);
-        right.add(deleteButton);
-        right.add(refreshButton);
+        actions.add(addButton);
+        actions.add(updateButton);
+        actions.add(deleteButton);
+        actions.add(refreshButton);
 
-        panel.add(title, BorderLayout.WEST);
-        panel.add(right, BorderLayout.EAST);
+        topRow.add(title, BorderLayout.WEST);
+        topRow.add(actions, BorderLayout.EAST);
+
+        // Align patient search directly below the action buttons.
+        JPanel searchRow = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
+        searchRow.setOpaque(false);
+
+        JLabel searchLabel = new JLabel("Patient ID:");
+        searchLabel.setForeground(TEXT);
+        searchLabel.setFont(new Font("SansSerif", Font.PLAIN, 12));
+
+        searchField = new JTextField(12);
+        searchField.setFont(new Font("SansSerif", Font.PLAIN, 12));
+
+        JButton searchButton = createButton("Search", TEAL);
+        JButton clearButton = createButton("Clear", new Color(85, 105, 108));
+
+        searchButton.addActionListener(e -> searchBills());
+        searchField.addActionListener(e -> searchBills());
+        clearButton.addActionListener(e -> {
+            searchField.setText("");
+            loadBills();
+        });
+
+        searchRow.add(searchLabel);
+        searchRow.add(searchField);
+        searchRow.add(searchButton);
+        searchRow.add(clearButton);
+
+        panel.add(topRow, BorderLayout.NORTH);
+        panel.add(searchRow, BorderLayout.SOUTH);
 
         return panel;
     }
 
-    
-    //Load all bills
+
+        //Load all bills
     
 
     private void loadBills() {
