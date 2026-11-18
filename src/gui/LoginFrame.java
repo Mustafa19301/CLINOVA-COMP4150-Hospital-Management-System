@@ -24,7 +24,7 @@ public class LoginFrame extends JFrame {
 
     public LoginFrame() {
 
-        setTitle("CarePoint | Hospital Management System");
+        setTitle("CLINOVA | Hospital Management System");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1200, 760);
         setMinimumSize(new Dimension(1000, 680));
@@ -92,7 +92,7 @@ public class LoginFrame extends JFrame {
         brandText.setLayout(new BoxLayout(brandText, BoxLayout.Y_AXIS));
         brandText.setBorder(new EmptyBorder(3, 14, 0, 0));
 
-        JLabel brandName = new JLabel("CAREPOINT");
+        JLabel brandName = new JLabel("CLINOVA");
         brandName.setFont(new Font("SansSerif", Font.BOLD, 19));
         brandName.setForeground(Color.WHITE);
 
