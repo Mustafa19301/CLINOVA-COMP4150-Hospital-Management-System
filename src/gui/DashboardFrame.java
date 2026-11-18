@@ -42,7 +42,7 @@ public class DashboardFrame extends JFrame {
         role = (String) staff.get("role");
         staffId = ((Number) staff.get("staff_id")).intValue();
 
-        setTitle("CarePoint | Dashboard");
+        setTitle("CLINOVA | Dashboard");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1250, 780);
         setMinimumSize(new Dimension(1000, 650));
@@ -82,7 +82,7 @@ public class DashboardFrame extends JFrame {
         header.setBorder(new EmptyBorder(17, 30, 17, 30));
         header.setPreferredSize(new Dimension(0, 76));
 
-        JLabel brand = new JLabel("CAREPOINT");
+        JLabel brand = new JLabel("CLINOVA");
         brand.setFont(new Font("SansSerif", Font.BOLD, 20));
         brand.setForeground(Color.WHITE);
 
@@ -149,7 +149,7 @@ public class DashboardFrame extends JFrame {
 
         sidebar.add(Box.createVerticalStrut(24));
 
-        JLabel moduleTitle = new JLabel("HOSPITAL SERVICES");
+        JLabel moduleTitle = new JLabel("SERVICES");
         moduleTitle.setFont(new Font("SansSerif", Font.BOLD, 10));
         moduleTitle.setForeground(new Color(151, 184, 181));
         moduleTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -177,7 +177,7 @@ public class DashboardFrame extends JFrame {
 
         sidebar.add(Box.createVerticalGlue());
 
-        JLabel portalLabel = new JLabel("CAREPOINT STAFF PORTAL");
+        JLabel portalLabel = new JLabel("CLINOVA STAFF PORTAL");
         portalLabel.setFont(new Font("SansSerif", Font.PLAIN, 9));
         portalLabel.setForeground(new Color(151, 184, 181));
         portalLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -396,7 +396,7 @@ public class DashboardFrame extends JFrame {
         content.add(topContent, BorderLayout.NORTH);
 
         JLabel footer = new JLabel(
-                "CarePoint Hospital Management System"
+                "CLINOVA Hospital Management System"
         );
         footer.setFont(new Font("SansSerif", Font.PLAIN, 11));
         footer.setForeground(MUTED);
@@ -426,7 +426,7 @@ public class DashboardFrame extends JFrame {
         title.setForeground(DARK);
 
         JLabel description = new JLabel(
-                "Your CarePoint workspace is ready."
+                "Your CLINOVA workspace is ready."
         );
         description.setFont(new Font("SansSerif", Font.PLAIN, 13));
         description.setForeground(MUTED);

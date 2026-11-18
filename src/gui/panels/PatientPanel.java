@@ -1043,7 +1043,7 @@ public class PatientPanel extends JPanel {
         JOptionPane.showMessageDialog(
                 this,
                 message,
-                "CarePoint",
+                "CLINOVA",
                 JOptionPane.ERROR_MESSAGE
         );
     }
@@ -1053,7 +1053,7 @@ public class PatientPanel extends JPanel {
         JOptionPane.showMessageDialog(
                 this,
                 message,
-                "CarePoint",
+                "CLINOVA",
                 JOptionPane.INFORMATION_MESSAGE
         );
     }
