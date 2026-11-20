@@ -1,4 +1,4 @@
-# COMP4150-Hospital-Management-System
+# CLINOVA - COMP4150-Hospital-Management-System
 Hospital Management System developed for COMP4150 Fall 2026
 
 Group Members:
@@ -8,16 +8,16 @@ Group Members:
 - Michael Powell
 
 ## Project Overview
-The Hospital Management System is designed to manage essential hospital operations through a relational database. We used
-MySQL to store and organize information related to patients, medical staff, appointments, medical records, prescriptions,
-medications and billing.
-
-The system focuses on database design, SQL queries and triggers with a GUI (Planned soon)
+CLINOVA is an Hospital Management System application designed to support essential hospital operations through an integrated graphical user interface and relational database.
+The system uses Java Swing for its desktop interface and MySQL for persistent data storage. It manages patients, medical staff, appointments, medical records, prescriptions, medications and billing.
+CLINOVA provides role based access for different staff members and integrates its graphical interface with database operations to support day to day hospital management tasks.
 
 ## Technologies
-- MySQL (Also MySQL Workbench)
-- Java & JDBC (GUI)
-- Git & GitHub (For Version Control)
+- Java 17
+- Java Swing
+- JDBC
+- MySQL
+- Git & GitHub
 
 ## Database Features
 - Staff
@@ -60,5 +60,63 @@ The system focuses on database design, SQL queries and triggers with a GUI (Plan
 - Preventing future medical record dates
 - Preventing invalid appointment scheduling conflicts
 
-## GUI (Soon)
-Will be ready next week...
+## Graphical User Interface (GUI)
+CLINOVA includes a fully functional Java Swing desktop application integrated with the MySQL database.
+The interface provides a centralized dashboard and dedicated management panels for the system's major hospital operations.
+
+### Dashboard
+- Centralized dashboard for navigating the application's modules
+- Displays relevant hospital management information
+- Provides an organized interface for accessing available functionality
+
+### User Authentication and Role Access
+- Supports separate staff login credentials
+- Provides role access for Doctor, Nurse, and Pharmacy Staff accounts
+- Restricts or tailors available functionality according to the authenticated staff member's role
+- Provides role access to relevant management modules
+
+### Patient Directory
+- View and search registered patients
+- Add new patient records
+- Update existing patient information
+- Delete patient records
+
+### Medical Records Management
+- Create and manage patient medical records
+- View existing medical history
+- Update and delete medical records
+- Associate records with the relevant patient and doctor
+
+### Appointment Scheduler
+- Calendar-based appointment scheduling interface
+- View appointments organized by date
+- Book and edit appointments
+- Mark appointments as completed or cancel scheduled appointments
+- View appointment details and status
+
+### Prescription Management
+- Create and manage patient prescriptions
+- Track prescription statuses
+- Support prescription dispensing workflows
+- Integrate prescription creation with automatic bill generation
+
+### Billing Management
+- View existing patient bills
+- Search bills using patient IDs
+- Update payment statuses
+- Delete existing bill records
+- Display patient names alongside their billing information
+
+## Database Integration
+- GUI operations are connected to the MySQL database through JDBC and DAO classes
+- Changes made through the interface are persisted in the database
+- Database constraints, stored procedures, and triggers support data integrity and business rules
+
+## Running Application
+- Install Java 17
+- Install MySQL Server
+- Import the provided SQL scripts to initialize the database
+- Configure the database connection credentials in the application
+- Ensure the MySQL Connector/J library is available to the project
+- Open the project in a compatible Java IDE
+- Run main.HospitalManagementApp to launch CLINOVA
